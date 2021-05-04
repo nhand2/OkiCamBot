@@ -8,6 +8,14 @@ OKI_UID = config('OKI_UID')
 OKI_BOT_COMMAND_PREFIX = config('OKI_BOT_COMMAND_PREFIX')
 
 fixingOkiMessage = 'Fixing Oki'
+voiceErrorMessage = 'Oki is not home right now!'
+
+#The list of messages Oki Bot can send.
+messageList = {
+    fixingOkiMessage,
+    voiceErrorMessage
+}
+
 client = discord.Client()
 
 print ('Oki Bot is running but not connected!')
@@ -31,10 +39,13 @@ async def on_message(message):
         message: The message from client.
     """
     if message.author == client.user:
+        if meet_criteria(message):
+            await message.delete(delay=5)
         return
     
     if message.content.startswith(OKI_BOT_COMMAND_PREFIX):
         await commands(message, message.content[len(OKI_BOT_COMMAND_PREFIX):])
+        await message.delete(delay=2)
 
 async def commands(message, command):
     """
@@ -48,7 +59,8 @@ async def commands(message, command):
         'hello':say_hello(message.channel),
         'broki':fix_oki_cam(message),
         'move_oki':move_oki_cam(message),
-        'help':help_manual(message)
+        'help':help_manual(message),
+        'purge':purge_commands(message)
     }
     await switcher.get(command, send_command_error(message.channel))
 
@@ -74,7 +86,18 @@ async def help_manual(message):
         \thello: Say hello to Oki bot!\n\
         \tbroki: Fix oki cam when Darnell or Kevin joins, smh my head\n\
         \tmove_oki: Moves oki to your current voice channel\n\
+        \tpurge: Purge command messages\n\
         \thelp: Show possible commands```')
+
+async def purge_commands(message):
+    '''
+    The purge commands.
+    Purge the commands and Oki Bot outputs.
+
+    args:
+        message: The caller messages.
+    '''
+    await message.channel.purge(check=meet_criteria_for_purge)
 
 async def move_oki_cam(message):
     pass
@@ -94,18 +117,20 @@ async def fix_oki_cam(message):
     """
     await message.channel.send(fixingOkiMessage)
     oki = await message.guild.fetch_member(OKI_UID)
-    currentVoiceChannel = oki.voice.channel
 
-    afk_channel = message.guild.afk_channel
+    if oki is not None and oki.voice is not None:
+        currentVoiceChannel = oki.voice.channel
+
+        afk_channel = message.guild.afk_channel
     
-    if currentVoiceChannel == afk_channel:
-        return
+        if currentVoiceChannel == afk_channel:
+            return
 
-    await oki.move_to(afk_channel)
-    await asyncio.sleep(5)
-    await oki.move_to(currentVoiceChannel)
-
-    await message.channel.purge(limit=100, check=meet_criteria)
+        await oki.move_to(afk_channel)
+        await asyncio.sleep(2)
+        await oki.move_to(currentVoiceChannel)
+    else:
+        await message.channel.send(voiceErrorMessage)
 
 async def send_command_error(channel):
     """
@@ -118,14 +143,24 @@ async def send_command_error(channel):
     print ("Invalid command!")
     pass
 
-def meet_criteria(message):
+def meet_criteria_for_purge(message):    
     '''
-    The meet criteria.
+    The meet criteria for purge.
     Checks if the criteria is met for purging messages.
 
     Args:
         message
     '''
-    return message.auther == client.user and message.content == fixingOkiMessage
+    return message.author == client.user or message.content.__contains__(OKI_BOT_COMMAND_PREFIX)
+
+def meet_criteria(message):
+    '''
+    The meet criteria.
+    Checks if the criteria is met for deleting messages.
+
+    Args:
+        message
+    '''
+    return message.content in messageList
 
 client.run(CLIENT_API_KEY)
