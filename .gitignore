@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # Discord.py Virtual Environment
-bot-env
+bot-env/
