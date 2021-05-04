@@ -97,7 +97,7 @@ async def purge_commands(message):
     args:
         message: The caller messages.
     '''
-    await message.channel.purge(check=meet_criteria_for_purge)
+    await message.channel.purge(limit=100, check=meet_criteria_for_purge)
 
 async def move_oki_cam(message):
     pass
