@@ -45,7 +45,6 @@ async def on_message(message):
     
     if message.content.startswith(OKI_BOT_COMMAND_PREFIX):
         await commands(message, message.content[len(OKI_BOT_COMMAND_PREFIX):])
-        await message.delete(delay=2)
 
 async def commands(message, command):
     """
@@ -131,6 +130,8 @@ async def fix_oki_cam(message):
         await oki.move_to(currentVoiceChannel)
     else:
         await message.channel.send(voiceErrorMessage)
+
+    await message.delete(delay=2)
 
 async def send_command_error(channel):
     """
