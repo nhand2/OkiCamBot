@@ -130,3 +130,6 @@ dmypy.json
 
 # Discord.py Virtual Environment
 bot-env/
+
+# The VS Code build folders
+.vscode/
