@@ -102,12 +102,8 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     @commands.command(name='sikfan')
     async def call_for_dinner(self, ctx):
         '''Time for dinner!'''
-
-        derek = await ctx.guild.fetch_member(self.bot.DEREK_UID)
-        jon = await ctx.guild.fetch_member(self.bot.JON_UID)
-        sophie = await ctx.guild.fetch_member(self.bot.SOAP_UID)
-        nam = await ctx.guild.fetch_member(self.bot.NAM_UID)
-        await ctx.send('Time to eat! {0} {1} {2} {3}'.format(derek.mention, jon.mention, sophie.mention, nam.mention))
+        
+        await ctx.send('Time to eat!')
 
     # The boba command.
     # Let the bot decide if you should get boba.
