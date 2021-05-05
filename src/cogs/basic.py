@@ -66,7 +66,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         '''I translate what Oki says!'''
 
         member = ctx.author
-        if member.id == int(self.bot.DEREK_UID):
+        if member.id == int(self.bot.NAM_UID):
             await ctx.send(self.okiNamMsgList[random.choice([0, 1, 2, 3])].format(member.mention))
         else:
             await ctx.send(self.okiLoveMsgList[random.choice([0, 1, 2, 3])].format(member.mention))
