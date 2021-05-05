@@ -23,7 +23,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     ]
 
     # The list of messages from oki to nam.
-    okiNameMsgList = [
+    okiNamMsgList = [
         '{0} is smelly >:3',
         '{0} holds me weird :\\',
         '{0} is okay. I guess.',
@@ -66,8 +66,8 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         '''I translate what Oki says!'''
 
         member = ctx.author
-        if member.id == 154713855526830080:
-            await ctx.send(self.okiNameMsgList[random.choice([0, 1, 2, 3])].format(member.mention))
+        if member.id == self.bot.NAM_UID:
+            await ctx.send(self.okiNamMsgList[random.choice([0, 1, 2, 3])].format(member.mention))
         else:
             await ctx.send(self.okiLoveMsgList[random.choice([0, 1, 2, 3])].format(member.mention))
 
@@ -95,6 +95,18 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
             await ctx.send(self.voiceErrorMessage)
 
         await ctx.message.delete(delay=2)
+
+    # The sik fan command.
+    # Used to call the family for dinner.
+    @commands.command(name='sikfan')
+    async def call_for_dinner(self, ctx):
+        '''Time for dinner!'''
+
+        derek = await ctx.guild.fetch_member(self.bot.DEREK_UID)
+        jon = await ctx.guild.fetch_member(self.bot.JON_UID)
+        sophie = await ctx.guild.fetch_member(self.bot.SOAP_UID)
+        nam = await ctx.guild.fetch_member(self.bot.NAM_UID)
+        await ctx.send('Time to eat! {0} {1} {2} {4}'.format(derek.mention, jon.mention, sophie.mention, nam.mention))
 
     # The boba command.
     # Let the bot decide if you should get boba.
