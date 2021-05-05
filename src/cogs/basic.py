@@ -3,6 +3,7 @@ import random
 
 from discord.ext import commands
 
+
 class BasicCommandsCog(commands.Cog, name='Basic Commands'):
 
     # The list of boba messages.
@@ -19,6 +20,14 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         '{0} is such a cool person!',
         'Bork means I love you in dog!',
         'I love {0} more than I love food! And that\'s a lot!'
+    ]
+
+    # The list of messages from oki to nam.
+    okiNameMsgList = [
+        '{0} is smelly >:3',
+        '{0} holds me weird :\\',
+        '{0} is okay. I guess.',
+        'Meh.'
     ]
 
     # The Oki cam fix status message.
@@ -58,7 +67,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
 
         member = ctx.author
         if member.id == 154713855526830080:
-            await ctx.send('{0} is smelly >:3'.format(member.mention))
+            await ctx.send(self.okiNameMsgList[random.choice([0, 1, 2, 3])].format(member.mention))
         else:
             await ctx.send(self.okiLoveMsgList[random.choice([0, 1, 2, 3])].format(member.mention))
 
