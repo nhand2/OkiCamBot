@@ -100,10 +100,19 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     # The sik fan command.
     # Used to call the family for dinner.
     @commands.command(name='sikfan')
-    async def call_for_dinner(self, ctx):
+    async def call_for_dinner(self, ctx, *args):
         '''Time for dinner!'''
+        await ctx.message.delete()
         
-        await ctx.send('Time to eat!')
+        if len(args) == 1 and args[0] == self.bot.SECRET_COMMAND:
+            derek = await ctx.guild.fetch_member(self.bot.DEREK_UID)
+            jon = await ctx.guild.fetch_member(self.bot.JON_UID)
+            sophie = await ctx.guild.fetch_member(self.bot.SOAP_UID)
+            nam = await ctx.guild.fetch_member(self.bot.NAM_UID)
+
+            await ctx.send('Time to eat! {0} {1} {2} {3}'.format(derek.mention, jon.mention, sophie.mention, nam.mention))
+        else:
+            await ctx.send('Time to eat!!')
 
     # The boba command.
     # Let the bot decide if you should get boba.

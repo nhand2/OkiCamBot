@@ -18,6 +18,7 @@ class OkiCamBot(commands.Bot):
     JON_UID = config('JON_UID')
     SOAP_UID = config('SOAP_UID')
     NAM_UID = config('NAM_UID')
+    SECRET_COMMAND = config('SECRET_COMMAND')
 
     def __init__(self):
         super().__init__(command_prefix=self.OKI_BOT_COMMAND_PREFIX)
