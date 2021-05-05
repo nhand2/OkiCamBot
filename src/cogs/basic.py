@@ -1,3 +1,4 @@
+import asyncio
 import discord
 import random
 
@@ -89,7 +90,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
                 return
 
             await oki.move_to(afk_channel)
-            await asyncio.sleep(2)
+            await asyncio.sleep(5)
             await oki.move_to(currentVoiceChannel)
         else:
             await ctx.send(self.voiceErrorMessage)
