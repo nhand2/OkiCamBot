@@ -1,3 +1,5 @@
 discord.py
 python-decouple
 pytz
+requests
+jsons
