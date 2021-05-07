@@ -1,11 +1,3 @@
-from asyncio import sleep as s
-from decouple import config
-from datetime import datetime, timedelta
-from discord import Embed
-from discord.ext import commands
-from pytz import timezone, utc
-from settings import Settings
-
 import asyncio
 import datetime
 import discord
@@ -13,6 +5,16 @@ import random
 import requests
 import json
 import pytz
+
+from discord.ext import commands
+from discord import Embed
+from asyncio import sleep as s
+from decouple import config
+from datetime import datetime, timedelta
+from pytz import timezone, utc
+from settings import Settings
+
+
 
 class BasicCommandsCog(commands.Cog, name='Basic Commands'):
 
@@ -195,9 +197,9 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     # The boba location must be open now, and within Las Vegas
     def get_boba_from_yelp(self, ctx):
         params = {'term': 'boba', 'location': 'Las Vegas',
-                  'limit': '20', 'open_now': True}
+                'limit': '20', 'open_now': True}
         header = {"User-Agent": "DiscordBot:OkiCamBot/bot:0.0.1 (by nipdip discord)",
-                  'Authorization': 'Bearer {}'.format(Settings.YELP_API_KEY)}
+                'Authorization': 'Bearer {}'.format(Settings.YELP_API_KEY)}
         response = requests.get(
             'https://api.yelp.com/v3/businesses/search', params=params, headers=header)
 
@@ -245,70 +247,63 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         mins = 0
         sec = 0
         msg = "default"
+        count = 0
         timezone = pytz.timezone("America/Los_Angeles")
-        present_time = datetime.datetime.now()
+        present_time = datetime.now()
         pp_time = timezone.localize(present_time)
         p_time = pp_time.strftime("%b %d, %I:%M:%S %Z")
-        print("present time at LV is " + p_time)
-        if len(args) == 5:
-            day = int(args[0][:-1])
-            hour = int(args[1][:-1])
-            mins = int(args[2][:-1])
-            sec = int(args[3][:-1])
-            msg = args[4]
-        elif len(args) == 4:
-            if args[0][-1] == 'd':
-                day = int(args[0][:-1])
-                if args[1][-1] == 'h':
-                    hour = int(args[1][:-1])
-                    if args[2][-1] == 'm':
-                        mins = int(args[2][:-1])
-                    elif args[2][-1] == 's':
-                        sec = int(args[2][:-1])
-                elif args[1][-1] == 'm':
-                    mins = int(arg[1][:-1])
-                    sec = int(arg[2][:-1])
-            elif args[0][-1] == 'h':
-                hour = int(args[0][:-1])
-                mins = int(args[1][:-1])
-                sec = int(arg[2][:-1])
-            msg = args[3]
-        elif len(args) == 3:
-            if args[0][-1] == 'd':
-                day = int(args[0][:-1])
-                if args[1][-1] == 'h':
-                    hour = int(args[1][:-1])
-                elif args[1][-1] == 'm':
-                    mins = int(args[1][:-1])
-                elif args[1][-1] == 's':
-                    sec = int(args[1][:-1])
-            elif args[0][-1] == 'h':
-                hour = int(args[0][:-1])
-                if args[1][-1] == 'm':
-                    mins = int(args[1][:-1])
-                elif args[1][-1] == 's':
-                    sec = int(args[1][:-1])
-            msg = arg[2]
-        elif len(args) == 2:
-            if args[0][-1] == 'd':
-                day = int(args[0][:-1])
-            if args[0][-1] == 'h':
-                hour = int(args[0][:-1])
-            if args[0][-1] == 'm':
-                mins = int(args[0][:-1])
-            if args[0][-1] == 's':
-                sec = int(args[0][:-1])
-            msg = args[-1]
-        update_time = datetime.datetime.now() + timedelta(days=day, hours=hour,
-                                                 minutes=mins, seconds=sec)
+        print("present time at LV is "+ p_time)
+        # oki.reminder 1d 3h 3m 2s WOOT
+        dCount = 0
+        hCount = 0
+        mCount = 0
+        sCount = 0
+        while args[count][0].isnumeric() and  args[count][-1].isalpha() and count < 4:
+            if args[count][-1] == 'd':
+                dCount += 1
+                if dCount < 2: 
+                    day = int(args[count][:-1])
+                else:
+                    break
+                
+            elif args[count][-1] == 'h':
+                hCount += 1
+                if hCount < 2:
+                    hour = int(arg[count][:-1])
+                else:
+                    break
+                
+            elif args[count][-1] == 'm':
+                mCount += 1
+                if mCount < 2:
+                    mins = int(args[count][:-1])
+                else:
+                    break
+                
+            elif args[count][-1] == 's':
+                sCount += 1 
+                if sCount < 2:
+                    sec = int(args[count][:-1])
+                else:
+                    break
+                
+            print(args[count][-1])
+            print(args[count][:-1])
+            print(count)
+            count += 1
+            
+        msg = ' '.join(args[count:])
+        
+        await ctx.send("days: " + str(day) + ", hours: " + str(hour) + ", minutes: " + str(mins) + ", seconds: "+ str(sec))
+        update_time = datetime.now() + timedelta(days = day, hours = hour, minutes = mins, seconds = sec)
         u_time = update_time.strftime("%b %d, %I:%M:%S")
         print("updated time at LV is " + u_time)
         while u_time >= p_time:
-            present_time = datetime.datetime.now()
+            present_time = datetime.now()
             pp_time = timezone.localize(present_time)
             p_time = pp_time.strftime("%b %d, %I:%M:%S")
             #print("this is current present time: " +
-                  #p_time + ", reminder: " + u_time)
+                #p_time + ", reminder: " + u_time)
 
             await asyncio.sleep(1)
         await member.send(msg)
