@@ -25,7 +25,8 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         'I love {0}! They\'re the best!',
         '{0} is such a cool person!',
         'Bork means I love you in dog!',
-        'I love {0} more than I love food! And that\'s a lot!'
+        'I love {0} more than I love food! And that\'s a lot!',
+        '大好き！！'
     ]
 
     # The list of messages from oki to nam.
@@ -33,9 +34,19 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         '{0} is smelly >:3',
         '{0} holds me weird :\\',
         '{0} is okay. I guess.',
-        'Meh.'
+        'Meh.',
+        '{0} is pretty cool ;D'
     ]
 
+    # The list of choice messages.
+    choiceMessagesList = [
+        '{0} is a good choice!',
+        'You can never go wrong with {0}',
+        '{0} is best!',
+        'Why not go with {0}!'
+        'I choose...{0}'
+    ]
+        
     # The Oki cam fix status message.
     fixingOkiMessage = 'Fixing Oki'
 
@@ -67,7 +78,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
 
     # The translate command.
     # Oki will show you some love!
-    @commands.command(name='translate')
+    @commands.command(name='translate', aliases=['t'])
     async def oki_love(self, ctx):
         '''I translate what Oki says!'''
 
@@ -77,9 +88,22 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         else:
             await ctx.send(random.choice(self.okiLoveMsgList).format(member.mention))
 
+    # The choose command.
+    # Oki chooses 
+    @commands.command(name='choose', aliases=['c'])
+    async def choose(self, ctx, *, arg):
+        '''Can't make a decision? Allow Oki to choose for you'''
+
+        choices = arg.split('|')
+        if len(choices) <= 1:
+            await ctx.send('You need two or more options!')
+            return
+
+        await ctx.send(random.choice(self.choiceMessagesList).format(random.choice(choices)))
+
     # The broki command.
     # Disconnect and reconnect the Oki cam.
-    @commands.command(name='broki')
+    @commands.command(name='broki', aliases=['b'])
     async def fix_oki_cam(self, ctx):
         '''Fixes the Oki cam when Darnell or Kevin joins, smh my head'''
 
