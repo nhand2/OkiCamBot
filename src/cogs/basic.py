@@ -1,19 +1,19 @@
 import asyncio
+import datetime
 import discord
 import random
-import datetime
-from datetime import datetime, timedelta
-import pytz
-from pytz import timezone, utc
-from asyncio import sleep as s
-import json
 import requests
-import sys
+import json
+import pytz
 
 from discord.ext import commands
 from discord import Embed
+from asyncio import sleep as s
 from decouple import config
+from datetime import datetime, timedelta
+from pytz import timezone, utc
 from settings import Settings
+
 
 
 class BasicCommandsCog(commands.Cog, name='Basic Commands'):
@@ -23,7 +23,8 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         'No. You should not get boba :[',
         'Yes! You should get boba! :]',
         'Of course! Boba time! <3',
-        'Boba is always the answer!'
+        'Boba is always the answer!',
+        'Always choose boba!'
     ]
 
     # The list of messages from oki.
@@ -31,7 +32,8 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         'I love {0}! They\'re the best!',
         '{0} is such a cool person!',
         'Bork means I love you in dog!',
-        'I love {0} more than I love food! And that\'s a lot!'
+        'I love {0} more than I love food! And that\'s a lot!',
+        '大好き！！'
     ]
 
     # The list of messages from oki to nam.
@@ -39,7 +41,24 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         '{0} is smelly >:3',
         '{0} holds me weird :\\',
         '{0} is okay. I guess.',
-        'Meh.'
+        'Meh.',
+        '{0} is pretty cool ;D'
+    ]
+
+    # The list of choice messages.
+    choiceMessagesList = [
+        '{0} is a good choice!',
+        'You can never go wrong with {0}',
+        '{0} is best!',
+        'Why not go with {0}!',
+        'I choose...{0}'
+    ]
+
+    # The list of banned locations.
+    # Do not show these.
+    bannedBobaList = [
+        'MadHouse Coffee',
+        'Kung Fu Tea'
     ]
 
     # The Oki cam fix status message.
@@ -73,7 +92,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
 
     # The translate command.
     # Oki will show you some love!
-    @commands.command(name='translate')
+    @commands.command(name='translate', aliases=['t'])
     async def oki_love(self, ctx):
         '''I translate what Oki says!'''
 
@@ -83,9 +102,22 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         else:
             await ctx.send(random.choice(self.okiLoveMsgList).format(member.mention))
 
+    # The choose command.
+    # Oki chooses
+    @commands.command(name='choose', aliases=['c'])
+    async def choose(self, ctx, *, arg):
+        '''Can't make a decision? Allow Oki to choose for you'''
+
+        choices = arg.split('|')
+        if len(choices) <= 1:
+            await ctx.send('You need two or more options!')
+            return
+
+        await ctx.send(random.choice(self.choiceMessagesList).format(random.choice(choices)))
+
     # The broki command.
     # Disconnect and reconnect the Oki cam.
-    @commands.command(name='broki')
+    @commands.command(name='broki', aliases=['b'])
     async def fix_oki_cam(self, ctx):
         '''Fixes the Oki cam when Darnell or Kevin joins, smh my head'''
 
@@ -164,9 +196,10 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     # Returns the coroutine that contains an embeded version of the the boba location suggested from yelp.
     # The boba location must be open now, and within Las Vegas
     def get_boba_from_yelp(self, ctx):
-        params = {'term': 'boba', 'location': '89148',
+        params = {'term': 'boba', 'location': 'Las Vegas',
                 'limit': '20', 'open_now': True}
-        header = {"User-Agent": "DiscordBot:OkiCamBot/bot:0.0.1 (by nipdip discord)", 'Authorization': 'Bearer {}'.format(Settings.YELP_API_KEY)}
+        header = {"User-Agent": "DiscordBot:OkiCamBot/bot:0.0.1 (by nipdip discord)",
+                'Authorization': 'Bearer {}'.format(Settings.YELP_API_KEY)}
         response = requests.get(
             'https://api.yelp.com/v3/businesses/search', params=params, headers=header)
 
@@ -174,7 +207,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
 
         suggestionDict = {}
         for businessObj in yelpRespDict['businesses']:
-            if businessObj['name'] == 'Kung Fu Tea':
+            if businessObj['name'] in self.bannedBobaList:
                 continue
             else:
                 suggestionDict[businessObj['name']] = [
@@ -202,8 +235,12 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     def meet_criteria_for_purge(self, message):
         return message.author == self.bot.user or message.content.__contains__(Settings.OKI_BOT_COMMAND_PREFIX)
 
-    @commands.command()
+    # The reminder command.
+    # Allows user to set reminders.
+    @commands.command(name='reminder', aliases=['r', 'remind'])
     async def reminder(self, ctx, *args):
+        '''Set a reminder! (format: oki.reminder <w>d <x>h <y>m <z>s <message>)'''
+
         member = ctx.author
         day = 0
         hour = 0
@@ -260,16 +297,17 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         await ctx.send("days: " + str(day) + ", hours: " + str(hour) + ", minutes: " + str(mins) + ", seconds: "+ str(sec))
         update_time = datetime.now() + timedelta(days = day, hours = hour, minutes = mins, seconds = sec)
         u_time = update_time.strftime("%b %d, %I:%M:%S")
-        print("updated time at LV is "+ u_time)
+        print("updated time at LV is " + u_time)
         while u_time >= p_time:
             present_time = datetime.now()
             pp_time = timezone.localize(present_time)
             p_time = pp_time.strftime("%b %d, %I:%M:%S")
-            print("this is current present time: " + p_time + ", reminder: " + u_time)
+            #print("this is current present time: " +
+                #p_time + ", reminder: " + u_time)
 
             await asyncio.sleep(1)
         await member.send(msg)
-        
+
 
 def setup(bot):
     bot.add_cog(BasicCommandsCog(bot))
