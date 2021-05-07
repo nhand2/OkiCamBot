@@ -4,7 +4,7 @@
 
 ### Setting up additional python packages
 #### Install python dependencies
-pip install -r requirements.txt
+`pip install -r requirements.txt`
 
 ### Setting up the environment file.
 * To use the `.env` file, remove the `.example` ending. 
