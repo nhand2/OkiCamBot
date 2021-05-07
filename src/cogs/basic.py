@@ -1,8 +1,13 @@
 import asyncio
 import discord
 import random
+import json
+import requests
 
 from discord.ext import commands
+from discord import Embed
+from decouple import config
+from settings import Settings
 
 
 class BasicCommandsCog(commands.Cog, name='Basic Commands'):
@@ -67,10 +72,10 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         '''I translate what Oki says!'''
 
         member = ctx.author
-        if member.id == int(self.bot.NAM_UID):
-            await ctx.send(self.okiNamMsgList[random.choice([0, 1, 2, 3])].format(member.mention))
+        if member.id == int(Settings.NAM_UID):
+            await ctx.send(random.choice(self.okiNamMsgList).format(member.mention))
         else:
-            await ctx.send(self.okiLoveMsgList[random.choice([0, 1, 2, 3])].format(member.mention))
+            await ctx.send(random.choice(self.okiLoveMsgList).format(member.mention))
 
     # The broki command.
     # Disconnect and reconnect the Oki cam.
@@ -79,7 +84,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         '''Fixes the Oki cam when Darnell or Kevin joins, smh my head'''
 
         await ctx.send(self.fixingOkiMessage)
-        oki = await ctx.guild.fetch_member(self.bot.OKI_UID)
+        oki = await ctx.guild.fetch_member(Settings.OKI_UID)
 
         if oki is not None and oki.voice is not None:
             currentVoiceChannel = oki.voice.channel
@@ -90,7 +95,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
                 return
 
             await oki.move_to(afk_channel)
-            await asyncio.sleep(5)
+            await asyncio.sleep(2)
             await oki.move_to(currentVoiceChannel)
         else:
             await ctx.send(self.voiceErrorMessage)
@@ -103,12 +108,12 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     async def call_for_dinner(self, ctx, *args):
         '''Time for dinner!'''
         await ctx.message.delete()
-        
-        if len(args) == 1 and args[0] == self.bot.SECRET_COMMAND:
-            derek = await ctx.guild.fetch_member(self.bot.DEREK_UID)
-            jon = await ctx.guild.fetch_member(self.bot.JON_UID)
-            sophie = await ctx.guild.fetch_member(self.bot.SOAP_UID)
-            nam = await ctx.guild.fetch_member(self.bot.NAM_UID)
+
+        if len(args) == 1 and args[0] == Settings.SECRET_COMMAND:
+            derek = await ctx.guild.fetch_member(Settings.DEREK_UID)
+            jon = await ctx.guild.fetch_member(Settings.JON_UID)
+            sophie = await ctx.guild.fetch_member(Settings.SOAP_UID)
+            nam = await ctx.guild.fetch_member(Settings.NAM_UID)
 
             await ctx.send('Time to eat! {0} {1} {2} {3}'.format(derek.mention, jon.mention, sophie.mention, nam.mention))
         else:
@@ -116,12 +121,68 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
 
     # The boba command.
     # Let the bot decide if you should get boba.
-    @commands.command(name='boba')
-    async def should_get_boba(self, ctx):
+    @commands.group(name='boba')
+    async def boba(self, ctx):
         '''Let me decide if you should get boba!'''
+        if ctx.invoked_subcommand is None:
+            value = random.randrange(len(self.bobaMessageList))
+            await ctx.send(self.bobaMessageList[value])
 
-        value = random.choice([0, 1, 2, 3])
-        await ctx.send(self.bobaMessageList[value])
+            if value > 0:
+                await asyncio.sleep(0.5)
+                await ctx.send("Should I choose? (reply with 'yes' or 'no')", delete_after=18.0)
+
+                # Checks to see if the message is send from the user and matches the input.
+                def check(m):
+                    return (m.content == 'yes' or m.content == 'no') and m.channel == ctx.message.channel and m.author == ctx.author
+
+                try:
+                    msg = await self.bot.wait_for('message', check=check, timeout=15.0)
+                except asyncio.TimeoutError:
+                    await ctx.send('You did not reply to the message! :[', delete_after=5.0)
+                else:
+                    if msg.content == 'no':
+                        await ctx.send('Okay!', delete_after=5.0)
+                        await msg.delete(delay=5.0)
+                    else:
+                        await self.get_boba_from_yelp(ctx)
+
+    # The boba where command.
+    # If the user enters this subcommand, a random boba location is obtained.
+    @boba.command(name='where')
+    async def where(self, ctx):
+        '''I can suggest a place!'''
+        await self.get_boba_from_yelp(ctx)
+
+    # The get boba from yelp.
+    # Returns the coroutine that contains an embeded version of the the boba location suggested from yelp.
+    # The boba location must be open now, and within Las Vegas
+    def get_boba_from_yelp(self, ctx):
+        params = {'term': 'boba', 'location': '89148',
+                  'limit': '20', 'open_now': True}
+        header = {"User-Agent": "DiscordBot:OkiCamBot/bot:0.0.1 (by nipdip discord)", 'Authorization': 'Bearer {}'.format(Settings.YELP_API_KEY)}
+        response = requests.get(
+            'https://api.yelp.com/v3/businesses/search', params=params, headers=header)
+
+        yelpRespDict = json.loads(response.content)
+
+        suggestionDict = {}
+        for businessObj in yelpRespDict['businesses']:
+            if businessObj['name'] == 'Kung Fu Tea':
+                continue
+            else:
+                suggestionDict[businessObj['name']] = [
+                    businessObj['url'], businessObj['image_url'], businessObj['location']]
+
+        suggested = random.choice(list(suggestionDict.items()))
+
+        discordEmbed = Embed()
+        discordEmbed.title = suggested[0]
+        discordEmbed.set_thumbnail(url=suggested[1][1])
+        discordEmbed.url = suggested[1][0]
+        discordEmbed.add_field(
+            name='Address', value='{0}\n{1}, {2}, {3}'.format(suggested[1][2]['address1'], suggested[1][2]['city'], suggested[1][2]['state'], suggested[1][2]['zip_code']))
+        return ctx.send(content='How about {0}?'.format(suggested[0]), embed=discordEmbed)
 
     # The purge command.
     # Purges messages within 100 (total) messages.
@@ -133,7 +194,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     # The meet criteria for purge.
     # Determines if the messages meet the criteria for purging.
     def meet_criteria_for_purge(self, message):
-        return message.author == self.bot.user or message.content.__contains__(self.bot.OKI_BOT_COMMAND_PREFIX)
+        return message.author == Settings.user or message.content.__contains__(Settings.OKI_BOT_COMMAND_PREFIX)
 
 
 def setup(bot):

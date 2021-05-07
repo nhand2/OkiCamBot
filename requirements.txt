@@ -1,2 +1,4 @@
 discord.py
 python-decouple
+requests
+jsons
