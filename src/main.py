@@ -9,7 +9,7 @@ from settings import Settings
 CLIENT_API_KEY = config('DISCORD_API_CLIENT_KEY')
 
 print('Oki Bot is running but not connected!')
-print(CLIENT_API_KEY)
+# print(CLIENT_API_KEY)
 
 namList = [
         'Ew Nam is a pee pee poopoo'
