@@ -4,6 +4,7 @@ import discord
 import random
 from decouple import config
 from discord.ext import commands
+from settings import Settings
 
 CLIENT_API_KEY = config('DISCORD_API_CLIENT_KEY')
 
@@ -12,16 +13,8 @@ print('Oki Bot is running but not connected!')
 
 class OkiCamBot(commands.Bot):
 
-    OKI_BOT_COMMAND_PREFIX = config('OKI_BOT_COMMAND_PREFIX')
-    OKI_UID = config('OKI_UID')
-    DEREK_UID = config('DEREK_UID')
-    JON_UID = config('JON_UID')
-    SOAP_UID = config('SOAP_UID')
-    NAM_UID = config('NAM_UID')
-    SECRET_COMMAND = config('SECRET_COMMAND')
-
     def __init__(self):
-        super().__init__(command_prefix=self.OKI_BOT_COMMAND_PREFIX)
+        super().__init__(command_prefix=Settings.OKI_BOT_COMMAND_PREFIX)
 
     # The on ready.
     # Overrides the API.
@@ -37,8 +30,11 @@ class OkiCamBot(commands.Bot):
         if message.author == client.user:
             return
 
-        if message.content.startswith(self.OKI_BOT_COMMAND_PREFIX):
+        if message.content.startswith(Settings.OKI_BOT_COMMAND_PREFIX):
             await self.process_commands(message)
+
+        if message.content.__contains__('69'):
+            await message.channel.send('nice')
 
     # The on command
     # Overrides the API.
