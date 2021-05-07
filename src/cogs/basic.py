@@ -48,8 +48,15 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         '{0} is a good choice!',
         'You can never go wrong with {0}',
         '{0} is best!',
-        'Why not go with {0}!'
+        'Why not go with {0}!',
         'I choose...{0}'
+    ]
+
+    # The list of banned locations.
+    # Do not show these.
+    bannedBobaList = [
+        'MadHouse Coffee',
+        'Kung Fu Tea'
     ]
 
     # The Oki cam fix status message.
@@ -187,7 +194,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     # Returns the coroutine that contains an embeded version of the the boba location suggested from yelp.
     # The boba location must be open now, and within Las Vegas
     def get_boba_from_yelp(self, ctx):
-        params = {'term': 'boba', 'location': '89148',
+        params = {'term': 'boba', 'location': 'Las Vegas',
                   'limit': '20', 'open_now': True}
         header = {"User-Agent": "DiscordBot:OkiCamBot/bot:0.0.1 (by nipdip discord)",
                   'Authorization': 'Bearer {}'.format(Settings.YELP_API_KEY)}
@@ -198,7 +205,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
 
         suggestionDict = {}
         for businessObj in yelpRespDict['businesses']:
-            if businessObj['name'] == 'Kung Fu Tea':
+            if businessObj['name'] in self.bannedBobaList:
                 continue
             else:
                 suggestionDict[businessObj['name']] = [
@@ -228,7 +235,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
 
     # The reminder command.
     # Allows user to set reminders.
-    @commands.command(name='reminder', aliases=['r'])
+    @commands.command(name='reminder', aliases=['r', 'remind'])
     async def reminder(self, ctx, *args):
         '''Set a reminder! (format: oki.reminder <w>d <x>h <y>m <z>s <message>)'''
 
@@ -239,7 +246,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         sec = 0
         msg = "default"
         timezone = pytz.timezone("America/Los_Angeles")
-        present_time = datetime.now()
+        present_time = datetime.datetime.now()
         pp_time = timezone.localize(present_time)
         p_time = pp_time.strftime("%b %d, %I:%M:%S %Z")
         print("present time at LV is " + p_time)
@@ -292,16 +299,16 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
             if args[0][-1] == 's':
                 sec = int(args[0][:-1])
             msg = args[-1]
-        update_time = datetime.now() + timedelta(days=day, hours=hour,
+        update_time = datetime.datetime.now() + timedelta(days=day, hours=hour,
                                                  minutes=mins, seconds=sec)
         u_time = update_time.strftime("%b %d, %I:%M:%S")
         print("updated time at LV is " + u_time)
         while u_time >= p_time:
-            present_time = datetime.now()
+            present_time = datetime.datetime.now()
             pp_time = timezone.localize(present_time)
             p_time = pp_time.strftime("%b %d, %I:%M:%S")
-            print("this is current present time: " +
-                  p_time + ", reminder: " + u_time)
+            #print("this is current present time: " +
+                  #p_time + ", reminder: " + u_time)
 
             await asyncio.sleep(1)
         await member.send(msg)
