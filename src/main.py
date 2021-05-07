@@ -10,11 +10,12 @@ CLIENT_API_KEY = config('DISCORD_API_CLIENT_KEY')
 
 print('Oki Bot is running but not connected!')
 
-namList = [
-        'Ew Nam is a pee pee poopoo'
-]
-
 class OkiCamBot(commands.Bot):
+
+    # The list of DMs to send to Nam.
+    namList = [
+        'Ew Nam is a pee pee poopoo'
+    ]
 
     def __init__(self):
         super().__init__(command_prefix=Settings.OKI_BOT_COMMAND_PREFIX)
@@ -38,11 +39,11 @@ class OkiCamBot(commands.Bot):
         
         # Checks if nam is mentioned in the message
         if "nam" in message.content.lower():
-            nam = await client.fetch_user(self.NAM_UID)
-            await nam.send( namList[0])
+            nam = await client.fetch_user(Settings.NAM_UID)
+            await nam.send(self.namList[0])
 
-        if message.content.__contains__('69'):
-            await message.channel.send('nice')
+    """ if message.content.__contains__('69'):
+            await message.channel.send('nice') """
 
     # The on command
     # Overrides the API.
