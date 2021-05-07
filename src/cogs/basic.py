@@ -194,7 +194,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     # The meet criteria for purge.
     # Determines if the messages meet the criteria for purging.
     def meet_criteria_for_purge(self, message):
-        return message.author == Settings.user or message.content.__contains__(Settings.OKI_BOT_COMMAND_PREFIX)
+        return message.author == self.bot.user or message.content.__contains__(Settings.OKI_BOT_COMMAND_PREFIX)
 
 
 def setup(bot):
