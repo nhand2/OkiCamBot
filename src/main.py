@@ -9,7 +9,11 @@ from settings import Settings
 CLIENT_API_KEY = config('DISCORD_API_CLIENT_KEY')
 
 print('Oki Bot is running but not connected!')
+print(CLIENT_API_KEY)
 
+namList = [
+        'Ew Nam is a pee pee poopoo'
+]
 
 class OkiCamBot(commands.Bot):
 
@@ -32,6 +36,11 @@ class OkiCamBot(commands.Bot):
 
         if message.content.startswith(Settings.OKI_BOT_COMMAND_PREFIX):
             await self.process_commands(message)
+        
+        # Checks if nam is mentioned in the message
+        if "nam" in message.content.lower():
+            nam = await client.fetch_user(self.NAM_UID)
+            await nam.send( namList[0])
 
         if message.content.__contains__('69'):
             await message.channel.send('nice')
