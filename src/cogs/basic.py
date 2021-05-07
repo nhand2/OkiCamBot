@@ -75,11 +75,6 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     def __init__(self, bot):
         self.bot = bot
 
-    # The cog command error.
-    # Overrides the base class function.
-    async def cog_command_error(self, ctx, error):
-        print('ERROR: {0.command.qualified_name}:{1}'.format(ctx, error))
-
     # The hello command.
     # Says hello the the caller.
     @commands.command(name='hello')
@@ -112,6 +107,12 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
             return
 
         await ctx.send(random.choice(self.choiceMessagesList).format(random.choice(choices)))
+
+    @choose.error
+    async def choose_error(self, ctx, error):
+        print (error)
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send('No options entered! Retry with the format `oki.choose <choice1> | <choice2> | ... | <choice(n)>.`')
 
     # The broki command.
     # Disconnect and reconnect the Oki cam.
