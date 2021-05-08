@@ -158,7 +158,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     #   error: error thrown
     @choose.error
     async def choose_error(self, ctx, error):
-        print(error)
+        print (f'WARN: {error} in {ctx.command}')
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send('Retry with the format `oki.choose <choice1> | <choice2> | ... | <choice(n)>.`')
 
@@ -206,10 +206,15 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         except IndexError:
             await ctx.send('Time to eat!!')
 
+    # The sik fan error handler.
+    # args:
+    #   ctx: context
+    #   error: error object
     @call_for_dinner.error
     async def call_for_dinner_error(self, ctx, error):
+        print (f'WARN: {error} in {ctx.command}')
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f'{error.retry_after}')
+            await ctx.send(f'This command can only be ran 5 times in 1 minute! Try again in {error.retry_after:.0f} seconds!')
 
     # The recommend command.
     # Recommends a restaurant meeting the criteria.
@@ -217,7 +222,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     #   ctx: context
     #   arg: key-word arguments
     @commands.command(name='recommend', aliases=['rec'])
-    @commands.cooldown(rate=1, per=15.0)
+    @commands.cooldown(rate=1, per=10.0)
     async def recommend(self, ctx, *, arg):
         '''Let me recommend you a place! Usage: oki.recommend <category> | <$$$$(price)>'''
         parsedArg = arg.split('|')
@@ -239,8 +244,12 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     #   error: The error thrown in string form.
     @recommend.error
     async def recommend_error(self, ctx, error):
+        print (f'WARN: {error} in {ctx.command}')
         if isinstance(error, commands.MissingRequiredArgument):
+            self.recommend.reset_cooldown(ctx)
             await ctx.send('You didn\'t specify what you wanted to me to recommend!')
+        elif isinstance(error, commands.CommandOnCooldown):
+            await ctx.send(f'The command is currently on cooldown! Try again in {error.retry_after:.0f} seconds!')
 
     # The boba command.
     # Let the bot decide if you should get boba.
