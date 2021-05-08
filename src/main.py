@@ -2,6 +2,7 @@
 import asyncio
 import discord
 import random
+
 from decouple import config
 from discord.ext import commands
 from settings import Settings
@@ -23,13 +24,15 @@ class OkiCamBot(commands.Bot):
     # The on ready.
     # Overrides the API.
     async def on_ready(self):
-        print('OkiBot is connected and logged in as {0.user}'.format(client))
+        print(f'OkiBot is connected and logged in as {client.user}')
 
         self.load_extension('cogs.basic')
         self.load_extension('cogs.help')
 
     # The on message.
     # Overrides the API.
+    # args:
+    #   message: message
     async def on_message(self, message):
         if message.author == client.user:
             return
@@ -47,11 +50,15 @@ class OkiCamBot(commands.Bot):
 
     # The on command
     # Overrides the API.
+    # args:
+    #   ctx: context
     async def on_command(self, ctx):
         msg = ctx.message
 
     # The meet criteria.
     # Determines if the message meets the criteria for deletion.
+    # args:
+    #   message: message
     def meet_criteria(message):
         return message.content in messageList
 
