@@ -31,7 +31,9 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         '{0} is such a cool person!',
         'Bork means I love you in dog!',
         'I love {0} more than I love food! And that\'s a lot!',
-        '大好き！！'
+        '大好き！！',
+        'I love {0} more than I love Mario!',
+        'Bork! Bork! Bork! <3'
     ]
 
     # The list of messages from oki to nam.
@@ -40,7 +42,8 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         '{0} holds me weird :\\',
         '{0} is okay. I guess.',
         'Meh.',
-        '{0} is pretty cool ;D'
+        '{0} is pretty cool ;D',
+        'Hello {0}.'
     ]
 
     # The list of choice messages.
