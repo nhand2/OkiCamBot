@@ -111,6 +111,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         self.jon = await self.bot.fetch_user(Settings.JON_UID)
         self.sophie = await self.bot.fetch_user(Settings.SOAP_UID)
         self.nam = await self.bot.fetch_user(Settings.NAM_UID)
+        self.fanfan = await self.bot.fetch_user(Setting.FANFAN_UID)
 
         self.initialize.cancel()
 
@@ -150,7 +151,10 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         if member.id == int(Settings.NAM_UID):
             await ctx.send(random.choice(self.okiNamMsgList).format(member.mention))
         else:
-            await ctx.send(random.choice(self.okiLoveMsgList).format(member.mention))
+            if member.id == int(Settings.FANFAN_UID) && random.randrange(20, 25, 3) == 23:
+                await ctx.send("{0} is my favorite person! <3".format(member.mention))
+            else:
+                await ctx.send(random.choice(self.okiLoveMsgList).format(member.mention))
 
     # The choose command.
     # Oki chooses between the options
