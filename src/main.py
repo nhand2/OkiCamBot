@@ -39,14 +39,6 @@ class OkiCamBot(commands.Bot):
 
         if message.content.startswith(Settings.OKI_BOT_COMMAND_PREFIX):
             await self.process_commands(message)
-        
-        # Checks if nam is mentioned in the message
-        if "nam" in message.content.lower():
-            nam = await client.fetch_user(Settings.NAM_UID)
-            await nam.send(self.namList[0])
-
-    """ if message.content.__contains__('69'):
-            await message.channel.send('nice') """
 
     # The on command
     # Overrides the API.
