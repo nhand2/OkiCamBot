@@ -8,5 +8,6 @@ class Settings():
     JON_UID = config('JON_UID')
     SOAP_UID = config('SOAP_UID')
     NAM_UID = config('NAM_UID')
+    FANFAN_UID = config('FANFAN_UID')
     SECRET_COMMAND = config('SECRET_COMMAND')
     YELP_API_KEY=config('YELP_API_KEY')
