@@ -151,7 +151,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         if member.id == int(Settings.NAM_UID):
             await ctx.send(random.choice(self.okiNamMsgList).format(member.mention))
         else:
-            if member.id == int(Settings.FANFAN_UID) && random.randrange(20, 25, 3) == 23:
+            if member.id == int(Settings.FANFAN_UID) and random.randrange(20, 25, 3) == 23:
                 await ctx.send("{0} is my favorite person! <3".format(member.mention))
             else:
                 await ctx.send(random.choice(self.okiLoveMsgList).format(member.mention))
