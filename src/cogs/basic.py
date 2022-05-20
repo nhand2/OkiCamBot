@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from decouple import config
 from discord import Embed
 from discord.ext import commands, tasks
+from main import OkiCamBot
 from pytz import timezone, utc
 from settings import Settings
 
@@ -251,6 +252,58 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     @commands.cooldown(rate=1, per=10.0)
     async def apex(self, ctx):
         '''What map are we on? Everyone hates Storm Point'''
+
+        if OkiCamBot.APEX_RUNNING :
+            print ("WARN: Already Running!")
+            await ctx.message.delete()
+            return
+
+        OkiCamBot.APEX_RUNNING = True
+
+        apexJsonResp = self.get_from_apex()
+
+        currentMap = apexJsonResp['current']
+        nextMap = apexJsonResp['next']
+        
+        currentMapEndTime = datetime.strptime(currentMap['readableDate_end'], '%Y-%m-%d %H:%M:%S')
+        discordEmbed = self.create_apex_embed(currentMap, nextMap)
+
+        message = await ctx.send(content=f'Map Rotation', embed=discordEmbed)
+        
+        while True:
+            await asyncio.sleep(0.5)
+
+            now = datetime.now()
+            
+            apexJsonResp = self.get_from_apex()
+
+            currentMap = apexJsonResp['current']
+            nextMap = apexJsonResp['next']
+
+            if now < currentMapEndTime:
+                discordEmbed.set_field_at(index=0, name="Time Remaining", value=currentMap['remainingTimer'])
+            else:
+                currentMapEndTime = datetime.strptime(currentMap['readableDate_end'], '%Y-%m-%d %H:%M:%S')
+                discordEmbed = self.create_apex_embed(currentMap, nextMap)
+
+            try:
+                await message.edit(embed=discordEmbed)
+            except discord.NotFound:
+                OkiCamBot.APEX_RUNNING = False
+                print("WARN: Message deleted, breaking loop!")
+                return
+                
+    # Catches errors from the apex command.
+    # args:
+    #   ctx: context
+    #   error: error received
+    @apex.error
+    async def apex_error(self, ctx, error):
+        print (f"WARN: {error} in {ctx.command}")
+        await ctx.message.delete()
+
+    # The get from apex api.
+    def get_from_apex(self):
         header = {"User-Agent": "DiscordBot:OkiCamBot/bot:0.0.1 (by nipdip discord)",
                   'Authorization': 'Bearer {}'.format(Settings.APEX_API_KEY)}
         response = requests.get(
@@ -258,9 +311,14 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
 
         apexJsonResp = json.loads(response.content)
 
-        currentMap = apexJsonResp['current']
-        nextMap = apexJsonResp['next']
-
+        return apexJsonResp
+    
+    # The create apex embed.
+    # Creates the embed to send to the discord server.
+    # args:
+    #   currentMap: The current map object
+    #   nextMap: The next map object
+    def create_apex_embed(self, currentMap, nextMap):
         discordEmbed = Embed(
             title = currentMap['map'],
             color = 0xB93038 )
@@ -276,7 +334,8 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
             name='Next map',
             value='{0}'.format(nextMap['map'])
         )
-        await ctx.send(content=f'Map Rotation', embed=discordEmbed)
+
+        return discordEmbed
 
     # The recommend command.
     # Recommends a restaurant meeting the criteria.

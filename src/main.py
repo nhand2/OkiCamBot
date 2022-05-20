@@ -12,6 +12,8 @@ CLIENT_API_KEY = config('DISCORD_API_CLIENT_KEY')
 print('Oki Bot is running but not connected!')
 
 class OkiCamBot(commands.Bot):
+    # Boolean used to determine if the apex command is already running to disallow counter spam.
+    APEX_RUNNING = False
 
     # The list of DMs to send to Nam.
     namList = [
@@ -25,7 +27,8 @@ class OkiCamBot(commands.Bot):
     # Overrides the API.
     async def on_ready(self):
         print(f'OkiBot is connected and logged in as {client.user}')
-
+        
+        self.APEX_RUNNING = False
         self.load_extension('cogs.basic')
         self.load_extension('cogs.help')
 
