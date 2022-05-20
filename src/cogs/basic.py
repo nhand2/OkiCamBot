@@ -243,6 +243,41 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(f'This command can only be ran 5 times in 1 minute! Try again in {error.retry_after:.0f} seconds!')
 
+    # The Apex map rotation command.
+    # Gets the current apex map rotation.
+    # args:
+    #   ctx: context
+    @commands.command(name='apex', aliases=['rotation'])
+    @commands.cooldown(rate=1, per=10.0)
+    async def apex(self, ctx):
+        '''What map are we on? Everyone hates Storm Point'''
+        header = {"User-Agent": "DiscordBot:OkiCamBot/bot:0.0.1 (by nipdip discord)",
+                  'Authorization': 'Bearer {}'.format(Settings.APEX_API_KEY)}
+        response = requests.get(
+            'https://api.mozambiquehe.re/maprotation?auth={}'.format(Settings.APEX_API_KEY), headers=header)
+
+        apexJsonResp = json.loads(response.content)
+
+        currentMap = apexJsonResp['current']
+        nextMap = apexJsonResp['next']
+
+        discordEmbed = Embed(
+            title = currentMap['map'],
+            color = 0xB93038 )
+        discordEmbed.set_image(url=currentMap['asset']),
+        discordEmbed.add_field(
+            name='Time Remaining', 
+            value='{0}'.format(currentMap['remainingTimer']))
+        discordEmbed.add_field(
+            name = '\u200B',
+            value = '\u200B'
+        )
+        discordEmbed.add_field(
+            name='Next map',
+            value='{0}'.format(nextMap['map'])
+        )
+        await ctx.send(content=f'Map Rotation', embed=discordEmbed)
+
     # The recommend command.
     # Recommends a restaurant meeting the criteria.
     # args:
