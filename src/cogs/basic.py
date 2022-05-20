@@ -277,8 +277,6 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
             
             apexJsonResp = self.get_from_apex()
             
-            print (apexJsonResp)
-
             try: 
                 currentMap = apexJsonResp['current']
                 nextMap = apexJsonResp['next']
@@ -297,6 +295,8 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
                     return
             except:
                 # Start a 30 second delay to allow the json to refresh between map changes.
+                
+                print (f"WARN: Unexpected response fron Apex API: {apexJsonResp}")
                 await asyncio.sleep(30)
                 
     # Catches errors from the apex command.
