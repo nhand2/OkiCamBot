@@ -112,7 +112,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         self.jon = await self.bot.fetch_user(Settings.JON_UID)
         self.sophie = await self.bot.fetch_user(Settings.SOAP_UID)
         self.nam = await self.bot.fetch_user(Settings.NAM_UID)
-        self.fanfan = await self.bot.fetch_user(Setting.FANFAN_UID)
+        self.fanfan = await self.bot.fetch_user(Settings.FANFAN_UID)
 
         self.initialize.cancel()
 
@@ -270,34 +270,43 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
 
         message = await ctx.send(content=f'Map Rotation', embed=discordEmbed)
         
-        while True:
-            await asyncio.sleep(0.5)
+        retries = 0
+        while retries < 3:
+            while OkiCamBot.APEX_RUNNING:
+                await asyncio.sleep(0.8)
 
-            now = datetime.now()
-            
-            apexJsonResp = self.get_from_apex()
-            
-            try: 
-                currentMap = apexJsonResp['current']
-                nextMap = apexJsonResp['next']
-
-                if now < currentMapEndTime:
-                    discordEmbed.set_field_at(index=0, name="Time Remaining", value=currentMap['remainingTimer'])
-                else:
-                    currentMapEndTime = datetime.strptime(currentMap['readableDate_end'], '%Y-%m-%d %H:%M:%S')
-                    discordEmbed = self.create_apex_embed(currentMap, nextMap)
-
-                try:
-                    await message.edit(embed=discordEmbed)
-                except discord.NotFound:
-                    OkiCamBot.APEX_RUNNING = False
-                    print("WARN: Message deleted, breaking loop!")
-                    return
-            except:
-                # Start a 30 second delay to allow the json to refresh between map changes.
+                now = datetime.now()
                 
-                print (f"WARN: Unexpected response fron Apex API: {apexJsonResp}")
-                await asyncio.sleep(30)
+                apexJsonResp = self.get_from_apex()
+                
+                try: 
+                    currentMap = apexJsonResp['current']
+                    nextMap = apexJsonResp['next']
+
+                    if now < currentMapEndTime:
+                        discordEmbed.set_field_at(index=0, name="Time Remaining", value=currentMap['remainingTimer'])
+                    else:
+                        currentMapEndTime = datetime.strptime(currentMap['readableDate_end'], '%Y-%m-%d %H:%M:%S')
+                        discordEmbed = self.create_apex_embed(currentMap, nextMap)
+
+                    try:
+                        await message.edit(embed=discordEmbed)
+                    except discord.NotFound:
+                        OkiCamBot.APEX_RUNNING = False
+                        print("WARN: Message deleted, breaking loop!")
+                        return
+                except:
+                    # Start a 30 second delay to allow the json to refresh between map changes.
+                    
+                    print (f"WARN: Unexpected response fron Apex API: {apexJsonResp}")
+                    await asyncio.sleep(30)
+            
+            print ("WARN: Apex timer has stopped working! Retrying in 1 min...")
+            retries += 1
+            asyncio.sleep(60)
+            OkiCamBot.APEX_RUNNING = True
+        
+        print ("WARN: Apex timer failed to restart. Please manually restart timer.")
                 
     # Catches errors from the apex command.
     # args:
@@ -306,6 +315,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     @apex.error
     async def apex_error(self, ctx, error):
         print (f"WARN: {error} in {ctx.command}")
+        OkiCamBot.APEX_RUNNING = False
         await ctx.message.delete()
 
     # The get from apex api.
@@ -511,7 +521,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
             elif args[count][-1] == 'h':
                 hCount += 1
                 if hCount < 2:
-                    hour = int(arg[count][:-1])
+                    hour = int(args[count][:-1])
                 else:
                     break
 

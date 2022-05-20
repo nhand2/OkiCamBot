@@ -9,6 +9,13 @@ from settings import Settings
 
 CLIENT_API_KEY = config('DISCORD_API_CLIENT_KEY')
 
+fixingOkiMessage = 'Fixing Oki'
+voiceErrorMessage = 'Oki is not home right now!'
+messageList = {
+    fixingOkiMessage,
+    voiceErrorMessage
+}
+
 print('Oki Bot is running but not connected!')
 
 class OkiCamBot(commands.Bot):
