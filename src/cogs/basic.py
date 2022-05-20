@@ -273,7 +273,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         retries = 0
         while retries < 3:
             while OkiCamBot.APEX_RUNNING:
-                await asyncio.sleep(0.8)
+                await asyncio.sleep(30)
 
                 now = datetime.now()
                 
