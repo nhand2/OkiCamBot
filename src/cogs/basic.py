@@ -276,22 +276,28 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
             now = datetime.now()
             
             apexJsonResp = self.get_from_apex()
+            
+            print (apexJsonResp)
 
-            currentMap = apexJsonResp['current']
-            nextMap = apexJsonResp['next']
+            try: 
+                currentMap = apexJsonResp['current']
+                nextMap = apexJsonResp['next']
 
-            if now < currentMapEndTime:
-                discordEmbed.set_field_at(index=0, name="Time Remaining", value=currentMap['remainingTimer'])
-            else:
-                currentMapEndTime = datetime.strptime(currentMap['readableDate_end'], '%Y-%m-%d %H:%M:%S')
-                discordEmbed = self.create_apex_embed(currentMap, nextMap)
+                if now < currentMapEndTime:
+                    discordEmbed.set_field_at(index=0, name="Time Remaining", value=currentMap['remainingTimer'])
+                else:
+                    currentMapEndTime = datetime.strptime(currentMap['readableDate_end'], '%Y-%m-%d %H:%M:%S')
+                    discordEmbed = self.create_apex_embed(currentMap, nextMap)
 
-            try:
-                await message.edit(embed=discordEmbed)
-            except discord.NotFound:
-                OkiCamBot.APEX_RUNNING = False
-                print("WARN: Message deleted, breaking loop!")
-                return
+                try:
+                    await message.edit(embed=discordEmbed)
+                except discord.NotFound:
+                    OkiCamBot.APEX_RUNNING = False
+                    print("WARN: Message deleted, breaking loop!")
+                    return
+            except:
+                # Start a 30 second delay to allow the json to refresh between map changes.
+                await asyncio.sleep(30)
                 
     # Catches errors from the apex command.
     # args:
