@@ -11,3 +11,4 @@ class Settings():
     FANFAN_UID = config('FANFAN_UID')
     SECRET_COMMAND = config('SECRET_COMMAND')
     YELP_API_KEY=config('YELP_API_KEY')
+    APEX_API_KEY=config('APEX_API_KEY')
