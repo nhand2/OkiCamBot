@@ -3,3 +3,4 @@ python-decouple
 pytz
 requests
 jsons
+nest_asyncio

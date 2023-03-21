@@ -1,30 +1,19 @@
 import asyncio
-import datetime
-import discord
 import random
 import requests
 import json
-import pytz
+import logging
 
 from asyncio import sleep as s
 from datetime import datetime, timedelta
 from decouple import config
 from discord import Embed
 from discord.ext import commands, tasks
-from main import OkiCamBot
 from pytz import timezone, utc
 from settings import Settings
+from bot_helper import UID_ENUM
 
 class BasicCommandsCog(commands.Cog, name='Basic Commands'):
-
-    # The list of boba messages.
-    bobaMessageList = [
-        'No. You should not get boba :[',
-        'Yes! You should get boba! :]',
-        'Of course! Boba time! <3',
-        'Boba is always the answer!',
-        'Always choose boba!'
-    ]
 
     # The list of messages from oki.
     okiLoveMsgList = [
@@ -45,32 +34,6 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         'Meh.',
         '{0} is pretty cool ;D',
         'Hello {0}.'
-    ]
-
-    # The list of choice messages.
-    choiceMessagesList = [
-        '{0} is a good choice!',
-        'You can never go wrong with {0}',
-        '{0} is best!',
-        'Why not go with {0}!',
-        'I choose...{0}'
-    ]
-
-    # The list of banned locations.
-    # Do not show these.
-    bannedBobaList = [
-        'MadHouse Coffee',
-        'Kung Fu Tea',
-        'Scoop LV'
-    ]
-
-    # The price range list for yelp api.
-    priceRange = [
-        '1,2,3,4',
-        '1',
-        '1,2',
-        '1,2,3',
-        '1,2,3,4'
     ]
 
     # The 2b copy pasta.
@@ -98,37 +61,28 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         fixingOkiMessage,
         voiceErrorMessage
     }
-
+    
+    userUidDict = {}
+    
     # The __init__
     def __init__(self, bot):
         self.bot = bot
-        self.initialize.start()
-
-    # The initialize
-    # Task loop to initalize all variables. Time out in 60 seconds.
-    @tasks.loop(seconds=60.0)
-    async def initialize(self):
-        self.derek = await self.bot.fetch_user(Settings.DEREK_UID)
-        self.jon = await self.bot.fetch_user(Settings.JON_UID)
-        self.sophie = await self.bot.fetch_user(Settings.SOAP_UID)
-        self.nam = await self.bot.fetch_user(Settings.NAM_UID)
-        self.fanfan = await self.bot.fetch_user(Settings.FANFAN_UID)
-
-        self.initialize.cancel()
-
-    # The before initialize loop
-    # Triggered before the initalize loop.
-    # Waits until the bot is ready to proceed.
-    @initialize.before_loop
-    async def before_initialize(self):
-        await self.bot.wait_until_ready()
-        print ('Initializing variables!')
-
-    # The after initialize loop
-    # Triggered after task loop is complete
-    @initialize.after_loop
-    async def after_initialize(self):
-        print ('Initialization done!')
+        self.logger = logging.getLogger(__name__)
+        self.logger.addHandler(logging.getLogger('__main__').handlers[0])
+        
+    @commands.Cog.listener()
+    async def on_ready(self):
+        for key, uid in Settings.USER_UIDS.items():
+            try:
+                self.userUidDict[key] = await self.bot.fetch_user(int (uid))
+            except:
+                self.logger.info(f"{key} {uid} ")
+                
+    async def cog_load(self):
+        self.logger.info("Loaded Basic Cog")
+        
+    async def cog_unload(self) -> None:
+        self.logger.info("Unloaded Basic Cog")
 
     # The hello command.
     # Says hello the the caller.
@@ -149,10 +103,10 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
         '''I translate what Oki says!'''
 
         member = ctx.author
-        if member.id == int(Settings.NAM_UID):
+        if member.id == int(Settings.USER_UIDS.get(UID_ENUM.NAM)):
             await ctx.send(random.choice(self.okiNamMsgList).format(member.mention))
         else:
-            if member.id == int(Settings.FANFAN_UID) and random.randrange(20, 25, 3) == 23:
+            if member.id == int(Settings.USER_UIDS.get(UID_ENUM.FANFAN)) and random.randrange(20, 25, 3) == 23:
                 await ctx.send("{0} is my favorite person! <3".format(member.mention))
             else:
                 await ctx.send(random.choice(self.okiLoveMsgList).format(member.mention))
@@ -180,7 +134,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     #   error: error thrown
     @choose.error
     async def choose_error(self, ctx, error):
-        print (f'WARN: {error} in {ctx.command}')
+        self.logger.warn(f'WARN: {error} in {ctx.command}')
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send('Retry with the format `oki.choose <choice1> | <choice2> | ... | <choice(n)>.`')
 
@@ -230,7 +184,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
 
         try: 
             args[0] == Settings.SECRET_COMMAND
-            await ctx.send(f'Time to eat! {self.derek.mention} {self.jon.mention} {self.sophie.mention} {self.nam.mention}')
+            await ctx.send(f'Time to eat! {self.userUidDict.get(UID_ENUM.SOAP).mention} {self.userUidDict.get(UID_ENUM.DEREK).mention} {self.userUidDict.get(UID_ENUM.JON).mention} {self.userUidDict.get(UID_ENUM.NAM).mention}')
         except IndexError:
             await ctx.send('Time to eat!!')
 
@@ -240,233 +194,9 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     #   error: error object
     @call_for_dinner.error
     async def call_for_dinner_error(self, ctx, error):
-        print (f'WARN: {error} in {ctx.command}')
+        self.logger.warn(f'WARN: {error} in {ctx.command}')
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(f'This command can only be ran 5 times in 1 minute! Try again in {error.retry_after:.0f} seconds!')
-
-    # The Apex map rotation command.
-    # Gets the current apex map rotation.
-    # args:
-    #   ctx: context
-    @commands.command(name='apex', aliases=['rotation'])
-    @commands.cooldown(rate=1, per=10.0)
-    async def apex(self, ctx):
-        '''What map are we on? Everyone hates Storm Point'''
-
-        if OkiCamBot.APEX_RUNNING :
-            print ("WARN: Already Running!")
-            await ctx.message.delete()
-            return
-
-        OkiCamBot.APEX_RUNNING = True
-
-        apexJsonResp = self.get_from_apex()
-
-        currentMap = apexJsonResp['current']
-        nextMap = apexJsonResp['next']
-        
-        currentMapEndTime = datetime.strptime(currentMap['readableDate_end'], '%Y-%m-%d %H:%M:%S')
-        discordEmbed = self.create_apex_embed(currentMap, nextMap)
-
-        message = await ctx.send(content=f'Map Rotation', embed=discordEmbed)
-        
-        retries = 0
-        while retries < 3:
-            while OkiCamBot.APEX_RUNNING:
-                await asyncio.sleep(30)
-
-                now = datetime.now()
-                
-                apexJsonResp = self.get_from_apex()
-                
-                try: 
-                    currentMap = apexJsonResp['current']
-                    nextMap = apexJsonResp['next']
-
-                    if now < currentMapEndTime:
-                        discordEmbed.set_field_at(index=0, name="Time Remaining", value=currentMap['remainingTimer'])
-                    else:
-                        currentMapEndTime = datetime.strptime(currentMap['readableDate_end'], '%Y-%m-%d %H:%M:%S')
-                        discordEmbed = self.create_apex_embed(currentMap, nextMap)
-
-                    try:
-                        await message.edit(embed=discordEmbed)
-                    except discord.NotFound:
-                        OkiCamBot.APEX_RUNNING = False
-                        print("WARN: Message deleted, breaking loop!")
-                        return
-                except:
-                    # Start a 30 second delay to allow the json to refresh between map changes.
-                    
-                    print (f"WARN: Unexpected response fron Apex API: {apexJsonResp}")
-                    await asyncio.sleep(30)
-            
-            print ("WARN: Apex timer has stopped working! Retrying in 1 min...")
-            retries += 1
-            asyncio.sleep(60)
-            OkiCamBot.APEX_RUNNING = True
-        
-        print ("WARN: Apex timer failed to restart. Please manually restart timer.")
-                
-    # Catches errors from the apex command.
-    # args:
-    #   ctx: context
-    #   error: error received
-    @apex.error
-    async def apex_error(self, ctx, error):
-        print (f"WARN: {error} in {ctx.command}")
-        OkiCamBot.APEX_RUNNING = False
-        await ctx.message.delete()
-
-    # The get from apex api.
-    def get_from_apex(self):
-        header = {"User-Agent": "DiscordBot:OkiCamBot/bot:0.0.1 (by nipdip discord)",
-                  'Authorization': 'Bearer {}'.format(Settings.APEX_API_KEY)}
-        response = requests.get(
-            'https://api.mozambiquehe.re/maprotation?auth={}'.format(Settings.APEX_API_KEY), headers=header)
-
-        apexJsonResp = json.loads(response.content)
-
-        return apexJsonResp
-    
-    # The create apex embed.
-    # Creates the embed to send to the discord server.
-    # args:
-    #   currentMap: The current map object
-    #   nextMap: The next map object
-    def create_apex_embed(self, currentMap, nextMap):
-        discordEmbed = Embed(
-            title = currentMap['map'],
-            color = 0xB93038 )
-        discordEmbed.set_image(url=currentMap['asset']),
-        discordEmbed.add_field(
-            name='Time Remaining', 
-            value='{0}'.format(currentMap['remainingTimer']))
-        discordEmbed.add_field(
-            name = '\u200B',
-            value = '\u200B'
-        )
-        discordEmbed.add_field(
-            name='Next map',
-            value='{0}'.format(nextMap['map'])
-        )
-
-        return discordEmbed
-
-    # The recommend command.
-    # Recommends a restaurant meeting the criteria.
-    # args:
-    #   ctx: context
-    #   arg: key-word arguments
-    @commands.command(name='recommend', aliases=['rec'])
-    @commands.cooldown(rate=1, per=10.0)
-    async def recommend(self, ctx, *, arg):
-        '''Let me recommend you a place! Usage: oki.recommend <category> | <$$$$(price)>'''
-        parsedArg = arg.split('|')
-        query = parsedArg[0]
-
-        price = 0
-        if len(parsedArg) > 1:
-            price = parsedArg[1].count('$', 1, 5)
-
-            print(price)
-
-        print(query)
-        print(self.priceRange[price])
-        await self.get_from_yelp(ctx, query, 'restaurants', self.priceRange[price])
-
-    # The recommend error handler.
-    # args:
-    #   ctx: context
-    #   error: The error thrown in string form.
-    @recommend.error
-    async def recommend_error(self, ctx, error):
-        print (f'WARN: {error} in {ctx.command}')
-        if isinstance(error, commands.MissingRequiredArgument):
-            self.recommend.reset_cooldown(ctx)
-            await ctx.send('You didn\'t specify what you wanted to me to recommend!')
-        elif isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f'The command is currently on cooldown! Try again in {error.retry_after:.0f} seconds!')
-
-    # The boba command.
-    # Let the bot decide if you should get boba.
-    # args:
-    #   ctx: context
-    @commands.group(name='boba')
-    async def boba(self, ctx):
-        '''Let me decide if you should get boba!'''
-        if ctx.invoked_subcommand is None:
-            value = random.randrange(len(self.bobaMessageList))
-            await ctx.send(self.bobaMessageList[value])
-
-            if value > 0:
-                await asyncio.sleep(0.5)
-                await ctx.send("Should I choose? (reply with 'yes' or 'no')", delete_after=18.0)
-
-                # Checks to see if the message is send from the user and matches the input.
-                def check(m):
-                    return (m.content.lower() == 'yes' or m.content.lower() == 'no') and m.channel == ctx.message.channel and m.author == ctx.author
-
-                try:
-                    msg = await self.bot.wait_for('message', check=check, timeout=15.0)
-                except asyncio.TimeoutError:
-                    await ctx.send('You did not reply to the message! :[', delete_after=5.0)
-                else:
-                    if msg.content == 'no':
-                        await ctx.send('Okay!', delete_after=5.0)
-                        await msg.delete(delay=5.0)
-                    else:
-                        await self.get_from_yelp(ctx, 'boba', 'bubbletea')
-
-    # The boba where command.
-    # If the user enters this subcommand, a random boba location is obtained.
-    # args:
-    #   ctx: context
-    @boba.command(name='where')
-    async def where(self, ctx):
-        '''I can suggest a place!'''
-        await self.get_from_yelp(ctx, 'boba', 'bubbletea')
-
-    # The get query from yelp.
-    # Returns the coroutine that contains an embeded version of the the query location suggested from yelp.
-    # The query location must be open now, and within Las Vegas
-    # args:
-    #   ctx: context
-    #   query: the query to search for on yelp
-    #   price: defaults to '1,2,3,4'. the price range.
-    def get_from_yelp(self, ctx, query, category, price='1,2,3,4'):
-        params = {'term': f'{query}', 'location': 'Las Vegas',
-                  'limit': '20', 'open_now': True, 'price': f'{price}', 
-                  'categories': f'{category}'}
-        header = {"User-Agent": "DiscordBot:OkiCamBot/bot:0.0.1 (by nipdip discord)",
-                  'Authorization': 'Bearer {}'.format(Settings.YELP_API_KEY)}
-        response = requests.get(
-            'https://api.yelp.com/v3/businesses/search', params=params, headers=header)
-
-        yelpRespDict = json.loads(response.content)
-
-        suggestionDict = {}
-        for businessObj in yelpRespDict['businesses']:
-            if businessObj['name'] in self.bannedBobaList or businessObj['rating'] < 3:
-                continue
-            else:
-                suggestionDict[businessObj['name']] = [
-                    businessObj['url'], businessObj['image_url'], businessObj['location']]
-
-        try:
-            suggested = random.choice(list(suggestionDict.items()))
-        except IndexError:
-            return ctx.send('Sorry! I couldn\'t find anything. :[')
-        else:
-            discordEmbed = Embed(
-                title = suggested[0],
-                url = suggested[1][0],
-                color = 0x3a86ff )
-            discordEmbed.set_thumbnail(url=suggested[1][1]),
-            discordEmbed.add_field(
-                name='Address', 
-                value='{0}\n{1}, {2}, {3}'.format(suggested[1][2]['address1'], suggested[1][2]['city'], suggested[1][2]['state'], suggested[1][2]['zip_code']) )
-            return ctx.send(content=f'How about {suggested[0]}?', embed=discordEmbed)
 
     # The purge command.
     # Purges messages within 100 (total) messages.
@@ -484,6 +214,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
     def meet_criteria_for_purge(self, message):
         return message.author == self.bot.user or message.content.__contains__(Settings.OKI_BOT_COMMAND_PREFIX)
 
+"""
     # The reminder command.
     # Allows user to set reminders.
     # args:
@@ -560,7 +291,7 @@ class BasicCommandsCog(commands.Cog, name='Basic Commands'):
 
             await asyncio.sleep(1)
         await member.send(msg)
+"""
 
-
-def setup(bot):
-    bot.add_cog(BasicCommandsCog(bot))
+async def setup(bot):
+    await bot.add_cog(BasicCommandsCog(bot))

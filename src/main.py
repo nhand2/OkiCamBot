@@ -2,10 +2,15 @@
 import asyncio
 import discord
 import random
+import logging
+import pytz
 
 from decouple import config
 from discord.ext import commands
 from settings import Settings
+from logging import handlers
+from datetime import datetime, timedelta
+from cogwatch import watch
 
 CLIENT_API_KEY = config('DISCORD_API_CLIENT_KEY')
 
@@ -16,28 +21,34 @@ messageList = {
     voiceErrorMessage
 }
 
-print('Oki Bot is running but not connected!')
-
 class OkiCamBot(commands.Bot):
-    # Boolean used to determine if the apex command is already running to disallow counter spam.
-    APEX_RUNNING = False
+    oki_bot_extensions = [
+        #'cogs.aero_gratter',
+        'cogs.apex',
+        'cogs.help',
+        'cogs.basic',
+        'cogs.yelp'
+    ]
+
+    aeroGratter = None
 
     # The list of DMs to send to Nam.
     namList = [
         'Ew Nam is a pee pee poopoo'
     ]
 
-    def __init__(self):
-        super().__init__(command_prefix=Settings.OKI_BOT_COMMAND_PREFIX)
+    def __init__(self, intents):
+        super().__init__(command_prefix=Settings.OKI_BOT_COMMAND_PREFIX, intents=intents)
+        
+    async def setup_hook(self):
+        for extension in self.oki_bot_extensions:
+            await self.load_extension(extension)
 
     # The on ready.
     # Overrides the API.
     async def on_ready(self):
-        print(f'OkiBot is connected and logged in as {client.user}')
-        
-        self.APEX_RUNNING = False
-        self.load_extension('cogs.basic')
-        self.load_extension('cogs.help')
+        logger.info(f'OkiBot is connected and logged in as {client.user}')
+        return
 
     # The on message.
     # Overrides the API.
@@ -46,9 +57,8 @@ class OkiCamBot(commands.Bot):
     async def on_message(self, message):
         if message.author == client.user:
             return
-
-        if message.content.startswith(Settings.OKI_BOT_COMMAND_PREFIX):
-            await self.process_commands(message)
+        
+        await self.process_commands(message)
 
     # The on command
     # Overrides the API.
@@ -56,6 +66,7 @@ class OkiCamBot(commands.Bot):
     #   ctx: context
     async def on_command(self, ctx):
         msg = ctx.message
+        logger.info(f"{msg.author} sent command {msg}")
 
     # The meet criteria.
     # Determines if the message meets the criteria for deletion.
@@ -66,5 +77,31 @@ class OkiCamBot(commands.Bot):
 
 
 if __name__ == '__main__':
-    client = OkiCamBot()
-    client.run(CLIENT_API_KEY)
+    intents=discord.Intents.default()
+    intents.messages = True
+    intents.dm_messages = True
+    intents.message_content= True
+    
+    logging.getLogger().setLevel(logging.DEBUG)
+    discordLogger = logging.getLogger('discord')
+    discordLogger.setLevel(logging.DEBUG)
+    logging.getLogger('discord.http').setLevel(logging.INFO)
+    
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.CRITICAL)
+    
+    handler = handlers.RotatingFileHandler(filename=f'oki_bot_{datetime.now(pytz.timezone("America/Los_Angeles"))}.log', encoding='utf-8', maxBytes=32 * 1024 * 1024, backupCount=3)
+    dt_fmt = '%Y-%m-%d %H:%M:%S'
+    formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
+    handler.setFormatter(formatter)
+    
+    # Add the handler to the discord logger
+    discordLogger.addHandler(handler)
+    # Add the handler to the root logger
+    logger = logging.getLogger(__name__)
+    logger.addHandler(handler)
+
+    logger.warning("OKi bot has started but not connected")
+
+    client = OkiCamBot(intents)
+    client.run(CLIENT_API_KEY, log_handler=None)

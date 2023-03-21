@@ -9,10 +9,10 @@ class Help(commands.Cog):
 
     # The cog unload.
     # Overrides the API.
-    def cog_unload(self):
+    async def cog_unload(self):
         self.bot.help_command = self._original_help_command
 
 
-def setup(bot):
-    bot.add_cog(Help(bot))
+async def setup(bot):
+    await bot.add_cog(Help(bot))
     bot.get_command('help').hidden = True
