@@ -23,7 +23,7 @@ messageList = {
 
 class OkiCamBot(commands.Bot):
     oki_bot_extensions = [
-        #'cogs.aero_gratter',
+        'cogs.aero_gratter',
         'cogs.apex',
         'cogs.help',
         'cogs.basic',
