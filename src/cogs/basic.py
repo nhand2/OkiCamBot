@@ -5,6 +5,7 @@ from asyncio import sleep as s
 
 from decouple import config
 from discord.ext import commands
+from discord import Embed
 from pytz import timezone, utc
 
 from bot_helper import UID_ENUM
@@ -223,6 +224,15 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
             Settings.OKI_BOT_COMMAND_PREFIX
         )
 
+    # The oki react command.
+    # Reacts with an oki image
+    # args:
+    @commands.command(name="oki")
+    async def oki_image(self, ctx):
+        """Send an image of oki"""
+        discordEmbed = Embed()
+        discordEmbed.set_image(url="/src/images")
+        await ctx.send(discordEmbed)
 
 async def setup(bot):
     await bot.add_cog(BasicCommandsCog(bot))
