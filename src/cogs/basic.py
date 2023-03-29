@@ -8,6 +8,7 @@ from discord.ext import commands
 from discord import Embed
 from discord import File
 from pytz import timezone, utc
+from random import randrange
 
 from bot_helper import UID_ENUM
 from settings import Settings
@@ -231,9 +232,10 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     @commands.command(name="oki")
     async def oki_image(self, ctx):
         """Send an image of oki"""
-        file = File("/src/images/oki.jpg", filename="oki.jpg")
+        number = randrange(8)
+        file = File(f"/src/images/oki{number}.jpg", filename=f"oki{number}.jpg")
         discordEmbed = Embed()
-        discordEmbed.set_image(url="attachment://oki.jpg")
+        discordEmbed.set_image(url=f"attachment://oki{number}.jpg")
         await ctx.send(file=file, embed=discordEmbed)
 
 async def setup(bot):
