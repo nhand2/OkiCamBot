@@ -238,5 +238,16 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
         discordEmbed.set_image(url=f"attachment://oki{number}.PNG")
         await ctx.send(file=file, embed=discordEmbed)
 
+    # The oki react command.
+    # Reacts with an oki image
+    # args:
+    @commands.command(name="tristan")
+    async def oki_tristan(self, ctx):
+        """Send an image of oki"""
+        file = File(f"./src/images/tristan.jpg", filename=f"tristan.jpg")
+        discordEmbed = Embed()
+        discordEmbed.set_image(url=f"attachment://tristan.jpg")
+        await ctx.send(file=file)
+
 async def setup(bot):
     await bot.add_cog(BasicCommandsCog(bot))
