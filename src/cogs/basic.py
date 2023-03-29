@@ -233,9 +233,9 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     async def oki_image(self, ctx):
         """Send an image of oki"""
         number = randrange(8)
-        file = File(f"/src/images/oki{number}.jpg", filename=f"oki{number}.jpg")
+        file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
         discordEmbed = Embed()
-        discordEmbed.set_image(url=f"attachment://oki{number}.jpg")
+        discordEmbed.set_image(url=f"attachment://oki{number}.PNG")
         await ctx.send(file=file, embed=discordEmbed)
 
 async def setup(bot):
