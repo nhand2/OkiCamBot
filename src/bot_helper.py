@@ -8,3 +8,4 @@ class UID_ENUM(Enum):
     SOAP = 4
     NAM = 5
     FANFAN = 6
+    HAKU = 7

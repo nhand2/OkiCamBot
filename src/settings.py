@@ -16,4 +16,5 @@ class Settings:
         UID_ENUM.SOAP: config("SOAP_UID"),
         UID_ENUM.NAM: config("NAM_UID"),
         UID_ENUM.FANFAN: config("FANFAN_UID"),
+        UID_ENUM.HAKU: config("HAKU_UID")
     }
