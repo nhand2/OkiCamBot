@@ -74,13 +74,14 @@ class YelpCommandsCog(commands.Cog, name="Yelp Commands"):
 
         price = 0
         if len(parsedArg) > 1:
-            price = parsedArg[1].count('$', 1, 5)
+            locationQuery = parsedArg[1]
+            price = parsedArg[2].count('$', 1, 5)
 
             print(price)
 
         print(query)
         print(self.priceRange[price])
-        await self.get_from_yelp(ctx, query, 'restaurants', self.priceRange[price])
+        await self.get_from_yelp(ctx, query, 'restaurants', locationQuery, self.priceRange[price])
 
     # The recommend error handler.
     # args:
@@ -141,8 +142,8 @@ class YelpCommandsCog(commands.Cog, name="Yelp Commands"):
     #   ctx: context
     #   query: the query to search for on yelp
     #   price: defaults to '1,2,3,4'. the price range.
-    def get_from_yelp(self, ctx, query, category, price='1,2,3,4'):
-        params = {'term': f'{query}', 'location': 'Las Vegas',
+    def get_from_yelp(self, ctx, query, category, locationQuery = 'Las Vegas', price='1,2,3,4'):
+        params = {'term': f'{query}', 'location': locationQuery,
                   'limit': '20', 'open_now': True, 'price': f'{price}', 
                   'categories': f'{category}'}
         header = {"User-Agent": "DiscordBot:OkiCamBot/bot:0.0.1 (by nipdip discord)",
