@@ -6,6 +6,7 @@ from asyncio import sleep as s
 from decouple import config
 from discord.ext import commands
 from discord import Embed
+from discord import File
 from pytz import timezone, utc
 
 from bot_helper import UID_ENUM
@@ -230,9 +231,10 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     @commands.command(name="oki")
     async def oki_image(self, ctx):
         """Send an image of oki"""
+        file = File("/src/images/oki.jpg", filename="oki.jpg")
         discordEmbed = Embed()
-        discordEmbed.set_image(url="/src/images")
-        await ctx.send(discordEmbed)
+        discordEmbed.set_image(url="attachment://oki.jpg")
+        await ctx.send(file=file, embed=discordEmbed)
 
 async def setup(bot):
     await bot.add_cog(BasicCommandsCog(bot))
