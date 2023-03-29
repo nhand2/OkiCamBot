@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class UID_ENUM(Enum):
     OKI = 1
     DEREK = 2

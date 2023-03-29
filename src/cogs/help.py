@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+
 class Help(commands.Cog):
     def __init__(self, bot):
         self._original_help_command = bot.help_command
@@ -15,4 +16,4 @@ class Help(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(Help(bot))
-    bot.get_command('help').hidden = True
+    bot.get_command("help").hidden = True

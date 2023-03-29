@@ -1,16 +1,17 @@
 import asyncio
-import random
-import requests
 import json
 import logging
-
+import random
 from asyncio import sleep as s
+
+import requests
 from decouple import config
 from discord import Embed
-from discord.ext import commands, tasks
+from discord.ext import commands
 from pytz import timezone, utc
+
 from settings import Settings
-from logging import handlers
+
 
 class YelpCommandsCog(commands.Cog, name="Yelp Commands"):
     # The list of choice messages.
