@@ -98,7 +98,6 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     @commands.command(name="translate", aliases=["t"])
     async def oki_love(self, ctx):
         """I translate what Oki says!"""
-
         member = ctx.author
         if member.id == int(Settings.USER_UIDS.get(UID_ENUM.NAM)):
             await ctx.send(random.choice(self.okiNamMsgList).format(member.mention))
@@ -108,7 +107,7 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
                 and random.randrange(20, 25, 3) == 23
             ):
                 fanfan = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.FANFAN))
-                await fanfan.send(self.okiLoveMsgList[0].format(ctx.author.mention))
+                await fanfan.send(random.choice(self.okiLoveMsgList).format(member.mention))
                 await ctx.send("{0} is my favorite person! <3".format(member.mention))
             else:
                 await ctx.send(
@@ -234,7 +233,7 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     @commands.command(name="oki")
     async def oki_image(self, ctx):
         """Send an image of oki"""
-        number = randrange(10)
+        number = randrange(19)
         file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
         discordEmbed = Embed()
         discordEmbed.set_image(url=f"attachment://oki{number}.PNG")
@@ -258,7 +257,7 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     """
         @commands.command(name="nam")
         async def oki_nam(self, ctx):
-            number = randrange(10)  
+            number = randrange(19)  
             nam = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.NAM))
             file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
 
@@ -268,35 +267,35 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     """ 
     @commands.command(name="haku")
     async def oki_haku(self, ctx):
-        number = randrange(10)
+        number = randrange(19)
         haku = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.HAKU))
         file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
-        await haku.send(self.okiLoveMsgList[0].format(haku.mention))
-        await ctx.send("I-I send a message to haku!" + self.okiLoveMsgList[0].format(haku.mention), file=file)
+        await haku.send(random.choice(self.okiLoveMsgList).format(haku.mention))
+        await ctx.send("I-I send a message to haku!" + random.choice(self.okiLoveMsgList).format(haku.mention), file=file)
     
     @commands.command(name="audie")
     async def oki_audie(self, ctx):
-        number = randrange(10)
+        number = randrange(19)
         audie = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.AUDIE))
         file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
-        await audie.send(self.okiLoveMsgList[0].format(audie.mention))
-        await ctx.send("I-I send a message to audie!" + self.okiLoveMsgList[0].format(audie.mention), file=file)
+        await audie.send(random.choice(self.okiLoveMsgList).format(audie.mention))
+        await ctx.send("I-I send a message to audie!" + random.choice(self.okiLoveMsgList).format(audie.mention), file=file)
     
     @commands.command(name="fanfan")
     async def oki_fanfan(self, ctx):
-        number = randrange(10)
+        number = randrange(19)
         fanfan = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.FANFAN))
         file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
-        await fanfan.send(self.okiLoveMsgList[0].format(fanfan.mention))
-        await ctx.send("I-I send a message to fanfan!" + self.okiLoveMsgList[0].format(fanfan.mention), file=file)
+        await fanfan.send(random.choice(self.okiLoveMsgList).format(fanfan.mention))
+        await ctx.send("I-I send a message to fanfan!" + random.choice(self.okiLoveMsgList).format(fanfan.mention), file=file)
 
     @commands.command(name="derek")
     async def oki_derek(self, ctx):
-        number = randrange(10)
+        number = randrange(19)
         derek = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.DEREK))
         file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
-        await derek.send(self.okiLoveMsgList[0].format(derek.mention))
-        await ctx.send("I-I send a message to derek!" + self.okiLoveMsgList[0].format(derek.mention), file=file)
+        await derek.send(random.choice(self.okiLoveMsgList).format(derek.mention))
+        await ctx.send("I-I send a message to derek!" + random.choice(self.okiLoveMsgList).format(derek.mention), file=file)
     @commands.command(name="poll")
 
     async def oki_poll(self, ctx, *, arg):
@@ -336,5 +335,11 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
             '<:tristan:263978864538157056>'
         ]
         await ctx.send(f'{defaultString} {thoughts[random.randrange(len(thoughts) - 1)]}')
+    
+    @commands.command(name="frog")
+    async def oki_frog(self, ctx):
+        number = randrange(4)
+        file = File(f"./src/images/frog{number}.PNG", filename=f"frog{number}.PNG")
+        await ctx.send("froggy boi is my best fren!!\n **Art credit: AYU**", file=file)
 async def setup(bot):
     await bot.add_cog(BasicCommandsCog(bot))

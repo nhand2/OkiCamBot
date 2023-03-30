@@ -17,5 +17,6 @@ class Settings:
         UID_ENUM.NAM: config("NAM_UID"),
         UID_ENUM.FANFAN: config("FANFAN_UID"),
         UID_ENUM.HAKU: config("HAKU_UID"),
-        UID_ENUM.AUDIE: config("AUDIE_UID")
+        UID_ENUM.AUDIE: config("AUDIE_UID"),
+        UID_ENUM.VARD: config("VARD_UID")
     }

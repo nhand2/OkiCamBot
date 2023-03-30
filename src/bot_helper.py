@@ -10,3 +10,4 @@ class UID_ENUM(Enum):
     FANFAN = 6
     HAKU = 7
     AUDIE = 8
+    VARD = 9
