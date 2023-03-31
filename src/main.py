@@ -8,7 +8,6 @@ from discord.ext import commands
 from settings import Settings
 from logging import handlers
 from datetime import datetime
-from cogwatch import watch
 from pymongo import MongoClient
 
 CLIENT_API_KEY = config("DISCORD_API_CLIENT_KEY")
