@@ -1,4 +1,5 @@
 """The purpose of this bot is to provide the ability to move the Oki cam to and from a voice channel without admin intervention."""
+import sys
 import discord
 import logging
 import pytz
@@ -19,7 +20,7 @@ messageList = {fixingOkiMessage, voiceErrorMessage}
 
 class OkiCamBot(commands.Bot):
     oki_bot_extensions = [
-        "cogs.aero_gratter",
+        # "cogs.aero_gratter",
         "cogs.apex",
         "cogs.help",
         "cogs.basic",
@@ -57,7 +58,8 @@ class OkiCamBot(commands.Bot):
     async def on_message(self, message):
         if message.author == client.user:
             return
-
+        
+        message.content = message.content.lower()
         await self.process_commands(message)
 
     # The on command
@@ -92,7 +94,7 @@ if __name__ == "__main__":
     ch.setLevel(logging.CRITICAL)
 
     handler = handlers.RotatingFileHandler(
-        filename=f'oki_bot_{datetime.now(pytz.timezone("America/Los_Angeles"))}.log',
+        filename=f'oki_bot.log',
         encoding="utf-8",
         maxBytes=32 * 1024 * 1024,
         backupCount=3,
@@ -110,7 +112,8 @@ if __name__ == "__main__":
     logger.addHandler(handler)
 
     logger.warning("OKi bot has started but not connected")
-
+    logger.addHandler(logging.StreamHandler(sys.stdout))
+    
     CONNECT_STRING = Settings.MONGO_DB_SECRET
     db_client = MongoClient(CONNECT_STRING)
 

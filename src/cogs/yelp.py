@@ -75,9 +75,10 @@ class YelpCommandsCog(commands.Cog, name="Yelp Commands"):
         price = 0
         if len(parsedArg) > 1:
             locationQuery = parsedArg[1]
-            price = parsedArg[2].count('$', 1, 5)
+            if len(parsedArg) > 2:
+                price = parsedArg[2].count('$', 1, 5)
 
-            print(price)
+                print(price)
 
         print(query)
         print(self.priceRange[price])
