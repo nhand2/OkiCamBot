@@ -107,7 +107,6 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     @commands.command(name="translate", aliases=["t"])
     async def oki_love(self, ctx):
         """I translate what Oki says!"""
-
         member = ctx.author
         if member.id == int(Settings.USER_UIDS.get(UID_ENUM.NAM)):
             await ctx.send(random.choice(self.okiNamMsgList).format(member.mention))
@@ -116,6 +115,8 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
                 member.id == int(Settings.USER_UIDS.get(UID_ENUM.FANFAN))
                 and random.randrange(20, 25, 3) == 23
             ):
+                fanfan = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.FANFAN))
+                await fanfan.send(random.choice(self.okiLoveMsgList).format(member.mention))
                 await ctx.send("{0} is my favorite person! <3".format(member.mention))
             else:
                 await ctx.send(
@@ -241,7 +242,7 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     @commands.command(name="oki")
     async def oki_image(self, ctx):
         """Send an image of oki"""
-        number = randrange(8)
+        number = randrange(19)
         file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
         discordEmbed = Embed()
         discordEmbed.set_image(url=f"attachment://oki{number}.PNG")
@@ -304,7 +305,7 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
         file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
         await derek.send(random.choice(self.okiLoveMsgList).format(derek.mention))
         await ctx.send("I-I send a message to derek!" + random.choice(self.okiLoveMsgList).format(derek.mention), file=file)
-        
+
     @commands.command(name="soap")
     async def oki_derek(self, ctx):
         number = randrange(19)
@@ -362,6 +363,6 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
         number = randrange(4)
         file = File(f"./src/images/frog{number}.PNG", filename=f"frog{number}.PNG")
         await ctx.send("froggy boi is my best fren!!\n **Art credit: AYU**", file=file)
-
+    
 async def setup(bot):
     await bot.add_cog(BasicCommandsCog(bot))

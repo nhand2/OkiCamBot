@@ -9,3 +9,5 @@ class UID_ENUM(Enum):
     NAM = 5
     FANFAN = 6
     HAKU = 7
+    AUDIE = 8
+    VARD = 9
