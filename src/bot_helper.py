@@ -11,3 +11,4 @@ class UID_ENUM(Enum):
     HAKU = 7
     AUDIE = 8
     VARD = 9
+    BETTY = 10

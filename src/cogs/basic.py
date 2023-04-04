@@ -275,13 +275,15 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
 
     """ 
 
-    @commands.command(name="message", aliases=["audie", "derek", "fanfan", "fannie", "haku", "soap"])
+    @commands.command(name="message", aliases=["audie", "betty", "derek", "fanfan", "fannie", "haku", "soap"])
     async def oki_message(self, ctx):
         number = randrange(19)
         user = None
         match ctx.invoked_with:
             case "audie":
                 user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.AUDIE))
+            case "betty":
+                user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.BETTY))
             case "derek":
                 user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.DEREK))
             case "fanfan" | "fannie":
