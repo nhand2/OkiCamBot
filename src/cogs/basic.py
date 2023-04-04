@@ -290,6 +290,9 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
                 user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.HAKU))
             case "soap":
                 user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.SOAP))
+            case _:
+                ctx.send("dunno who you are.... h-hek!")
+                return
 
         file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
         await user.send(random.choice(self.okiLoveMsgList).format(user.mention))
