@@ -36,6 +36,15 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
         "Hello {0}.",
     ]
 
+    okiDunnoList = [
+        "bork bork? wat did u say owo?",
+        "h-hek!?",
+        "bork bork?",
+        "dunno what u saying...",
+        "u have food??",
+        "l-love!"
+    ]
+
     # The 2b copy pasta.
     twob = """
 ⠄⠄⠄⠄⢠⣿⣿⣿⣿⣿⢻⣿⣿⣿⣿⣿⣿⣿⣿⣯⢻⣿⣿⣿⣿⣆⠄⠄⠄
@@ -265,39 +274,33 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
             await ctx.send("I-I send a message to nam!" + self.okiLoveMsgList[0].format(nam.mention), file=file)
 
     """ 
-    @commands.command(name="haku")
-    async def oki_haku(self, ctx):
-        number = randrange(19)
-        haku = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.HAKU))
-        file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
-        await haku.send(random.choice(self.okiLoveMsgList).format(haku.mention))
-        await ctx.send("I-I send a message to haku!" + random.choice(self.okiLoveMsgList).format(haku.mention), file=file)
-    
-    @commands.command(name="audie")
-    async def oki_audie(self, ctx):
-        number = randrange(19)
-        audie = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.AUDIE))
-        file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
-        await audie.send(random.choice(self.okiLoveMsgList).format(audie.mention))
-        await ctx.send("I-I send a message to audie!" + random.choice(self.okiLoveMsgList).format(audie.mention), file=file)
-    
-    @commands.command(name="fanfan")
-    async def oki_fanfan(self, ctx):
-        number = randrange(19)
-        fanfan = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.FANFAN))
-        file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
-        await fanfan.send(random.choice(self.okiLoveMsgList).format(fanfan.mention))
-        await ctx.send("I-I send a message to fanfan!" + random.choice(self.okiLoveMsgList).format(fanfan.mention), file=file)
 
-    @commands.command(name="derek")
-    async def oki_derek(self, ctx):
+    @commands.command(name="message", aliases=["audie", "betty", "derek", "fanfan", "fannie", "haku", "soap"])
+    async def oki_message(self, ctx):
         number = randrange(19)
-        derek = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.DEREK))
+        user = None
+        match ctx.invoked_with:
+            case "audie":
+                user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.AUDIE))
+            case "betty":
+                user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.BETTY))
+            case "derek":
+                user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.DEREK))
+            case "fanfan" | "fannie":
+                user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.FANFAN))
+            case "haku":
+                user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.HAKU))
+            case "soap":
+                user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.SOAP))
+            case _:
+                ctx.send("dunno who you are.... h-hek!")
+                return
+
         file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
-        await derek.send(random.choice(self.okiLoveMsgList).format(derek.mention))
-        await ctx.send("I-I send a message to derek!" + random.choice(self.okiLoveMsgList).format(derek.mention), file=file)
+        await user.send(random.choice(self.okiLoveMsgList).format(user.mention))
+        await ctx.send("I-I send a message! " + random.choice(self.okiLoveMsgList).format(user.mention), file=file)
+
     @commands.command(name="poll")
-
     async def oki_poll(self, ctx, *, arg):
         parsedArg = arg.split('|')
         oki = '<:stupid:694254790607372318>'
@@ -341,5 +344,10 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
         number = randrange(4)
         file = File(f"./src/images/frog{number}.PNG", filename=f"frog{number}.PNG")
         await ctx.send("froggy boi is my best fren!!\n **Art credit: AYU**", file=file)
+    
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        await ctx.send(random.choice(self.okiDunnoList))
+    
 async def setup(bot):
     await bot.add_cog(BasicCommandsCog(bot))
