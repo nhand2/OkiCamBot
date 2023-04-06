@@ -287,23 +287,27 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     @commands.command(name="message", aliases=["audie", "betty", "derek", "fanfan", "fannie", "haku", "soap"])
     async def oki_message(self, ctx):
         number = randrange(19)
-        user = None
+        user_uid = None
+        
         match ctx.invoked_with:
             case "audie":
-                user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.AUDIE))
+                user_uid = Settings.USER_UIDS.get(UID_ENUM.AUDIE)
             case "betty":
-                user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.BETTY))
+                user_uid = Settings.USER_UIDS.get(UID_ENUM.BETTY)
             case "derek":
-                user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.DEREK))
+                user_uid = Settings.USER_UIDS.get(UID_ENUM.DEREK)
             case "fanfan" | "fannie":
-                user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.FANFAN))
+                user_uid = Settings.USER_UIDS.get(UID_ENUM.FANFAN)
             case "haku":
-                user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.HAKU))
+                user_uid = Settings.USER_UIDS.get(UID_ENUM.HAKU)
             case "soap":
-                user = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.SOAP))
+                user_uid = Settings.USER_UIDS.get(UID_ENUM.SOAP)
             case _:
                 ctx.send("dunno who you are.... h-hek!")
                 return
+            
+        user = None
+        user = self.bot.get_user(user_uid) or await self.bot.fetch_user(user_uid)
 
         file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
         await user.send(random.choice(self.okiLoveMsgList).format(user.mention))

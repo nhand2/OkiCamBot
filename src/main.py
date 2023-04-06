@@ -56,6 +56,10 @@ class OkiCamBot(commands.Bot):
     # args:
     #   message: message
     async def on_message(self, message):
+        if isinstance(message.channel, discord.DMChannel):
+            await message.author.send("Hello")
+            return
+            
         if message.author == client.user:
             return
         
@@ -69,6 +73,7 @@ class OkiCamBot(commands.Bot):
     async def on_command(self, ctx):
         msg = ctx.message
         logger.info(f"{msg.author} sent command {msg}")
+        
 
     # The meet criteria.
     # Determines if the message meets the criteria for deletion.
