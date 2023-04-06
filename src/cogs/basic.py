@@ -64,6 +64,15 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
 
     # The response if Oki cam is not in voice channel.
     voiceErrorMessage = "Oki is not home right now!"
+    
+    # The list of choice messages.
+    choiceMessagesList = [
+        '{0} is a good choice!',
+        'You can never go wrong with {0}',
+        '{0} is best!',
+        'Why not go with {0}!',
+        'I choose...{0}'
+    ]
 
     # The list of messages Oki Bot can send.
     messageList = {fixingOkiMessage, voiceErrorMessage}
@@ -347,6 +356,7 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
+        print (error)
         await ctx.send(random.choice(self.okiDunnoList))
     
 async def setup(bot):

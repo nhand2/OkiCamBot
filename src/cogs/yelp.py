@@ -14,15 +14,6 @@ from settings import Settings
 
 
 class YelpCommandsCog(commands.Cog, name="Yelp Commands"):
-    # The list of choice messages.
-    choiceMessagesList = [
-        '{0} is a good choice!',
-        'You can never go wrong with {0}',
-        '{0} is best!',
-        'Why not go with {0}!',
-        'I choose...{0}'
-    ]
-
     # The list of banned locations.
     # Do not show these.
     bannedBobaList = [
