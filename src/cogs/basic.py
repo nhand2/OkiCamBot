@@ -147,7 +147,7 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
             return
 
         await ctx.send(
-            random.choice(self.choiceMessagesList).format(random.choice(choices))
+            random.choice(self.choiceMessagesList).format(random.choice(choices).strip())
         )
 
     # The choose error handler.
