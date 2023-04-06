@@ -1,6 +1,7 @@
 import datetime
 import logging
 import re
+import sys
 from datetime import datetime
 from datetime import timedelta as td
 from logging import handlers
@@ -12,22 +13,23 @@ from database.reminder_db import ReminderDb
 
 
 class ReminderCog(commands.Cog):
-    regex = r"(\s?[\d]{1,2}\syears|\s?[\d]{1,2}\syear|\s?[\d]{1,2}\s\<[yY]\>)|(\s?[\d]{1,2}\smonths|\s?[\d]{1,2}\smonth|\s?[\d]{1,2}\s\<[mM]\>)|(\s?[\d]{1,2}\sdays|\s?[\d]{1,2}\sday|\s?[\d]{1,2}\s\<[dD]\>)|(\s?[\d]{1,2}\shours|\s?[\d]{1,2}\shour|\s?[\d]{1,2}\s\<[hH]\>)|(\s?[\d]{1,2}\sminutes|\s?[\d]{1,2}\sminute|\s?[\d]{1,2}\s[mM]in([sS])?)"
+    regex = r"(\s?[\d]{1,2}\s\b[yY]ear[sS]?\b|\s?[\d]{1,2}\s\b\<[yY]\>\b)|(\s?[\d]{1,2}\s\b[mM]onth[sS]?\b|\s?[\d]{1,2}\s\b\<[mM]\>\b)|(\s?[\d]{1,2}\s\bday[sS]?\b|\s?[\d]{1,2}\s\b\<[dD]\>\b)|(\s?[\d]{1,2}\s\b[hH]our[sS]?\b|\s?[\d]{1,2}\s\b\<[hH]\>\b)|(\s?[\d]{1,2}\s\b[mM]inute[sS]?\b|\s?[\d]{1,2}\s\b[mM]in[sS]?\b)"
 
     def __init__(self, bot):
-        handler = handlers.RotatingFileHandler(
-            filename=f'reminders_{datetime.now(pytz.timezone("America/Los_Angeles"))}.log',
-            encoding="utf-8",
-            maxBytes=32 * 1024 * 1024,
-            backupCount=3,
-        )
-        dt_fmt = "%Y-%m-%d %H:%M:%S"
-        formatter = logging.Formatter(
-            "[{asctime}] [{levelname:<8}] {name}: {message}", dt_fmt, style="{"
-        )
-        handler.setFormatter(formatter)
+        # handler = handlers.RotatingFileHandler(
+        #     filename=f'reminders_{datetime.now(pytz.timezone("America/Los_Angeles"))}.log',
+        #     encoding="utf-8",
+        #     maxBytes=32 * 1024 * 1024,
+        #     backupCount=3,
+        # )
+        # dt_fmt = "%Y-%m-%d %H:%M:%S"
+        # formatter = logging.Formatter(
+        #     "[{asctime}] [{levelname:<8}] {name}: {message}", dt_fmt, style="{"
+        # )
+        # handler.setFormatter(formatter)
         self.logger = logging.getLogger(__name__)
-        self.logger.addHandler(handler)
+        #self.logger.addHandler(handler)
+        self.logger.addHandler(logging.StreamHandler(sys.stdout))
         
         self.bot = bot
         self.db = ReminderDb(bot.db_client)
@@ -50,7 +52,7 @@ class ReminderCog(commands.Cog):
     #   *args: the indexed arguments.
     @commands.command(name="reminder", aliases=["r", "remind"])
     async def reminder(self, ctx, *, args):
-        """Set a reminder! (format: oki.reminder <w>d <x>h <y>m <z>s | <message>)"""
+        """Set a reminder! (format: oki.reminder <#>years/year/y <#>months/month/m <#>days/day/d <#>hours/hour/h <#>minutes/minute/mins/min | <message>)"""
         try:
             timeMessage = args.split("|")
         except Exception as e:
@@ -96,12 +98,13 @@ class ReminderCog(commands.Cog):
                     timedelta += td(minutes=int(time[0]))
                 else:
                     await ctx.send("Couldn't set remind! No time set!")
+                    return
 
             member = ctx.author
 
             try:
                 if self.db.insert(
-                    member, str(timeMessage[1]), datetime.now() + timedelta
+                    member, str(timeMessage[1].strip()), datetime.now() + timedelta
                 ):
                     await ctx.send("Reminder set!")
                 else:
