@@ -4,15 +4,12 @@ import re
 import sys
 from datetime import datetime
 from datetime import timedelta as td
-from logging import handlers
-
-import pytz
 from discord.ext import commands, tasks
 
 from database.reminder_db import ReminderDb
 
 
-class ReminderCog(commands.Cog):
+class ReminderCog(commands.Cog, name='Reminders'):
     regex = r"(\s?[\d]{1,2}\s\b[yY]ear[sS]?\b|\s?[\d]{1,2}\s\b\<[yY]\>\b)|(\s?[\d]{1,2}\s\b[mM]onth[sS]?\b|\s?[\d]{1,2}\s\b\<[mM]\>\b)|(\s?[\d]{1,2}\s\bday[sS]?\b|\s?[\d]{1,2}\s\b\<[dD]\>\b)|(\s?[\d]{1,2}\s\b[hH]our[sS]?\b|\s?[\d]{1,2}\s\b\<[hH]\>\b)|(\s?[\d]{1,2}\s\b[mM]inute[sS]?\b|\s?[\d]{1,2}\s\b[mM]in[sS]?\b)"
 
     def __init__(self, bot):

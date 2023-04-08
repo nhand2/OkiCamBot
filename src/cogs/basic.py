@@ -194,6 +194,7 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     # Prints the 2b copy pasta.
     @commands.command(name="booty", aliases=["2b"])
     async def call_2b(self, ctx):
+        """What that booty do?"""
         await ctx.send(self.twob)
 
     # The sik fan command.
@@ -315,6 +316,8 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
 
     @commands.command(name="poll")
     async def oki_poll(self, ctx, *, arg):
+        """Create a poll."""
+        
         parsedArg = arg.split('|')
         oki = '<:stupid:694254790607372318>'
         pollString = f'O-oki here is your poll!! {oki}{oki}{oki}{oki}{oki}{oki}{oki}{oki}{oki}{oki}\n'
@@ -333,6 +336,7 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     
     @commands.command(name="think")
     async def oki_think(self, ctx):
+        """What's in my head?"""
         oki = '<:stupid:694254790607372318>'
         defaultString = f'I am thinking about {oki}{oki}{oki}{oki}{oki}{oki}{oki}{oki}{oki}{oki}\n'
         thoughts = [
