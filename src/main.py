@@ -56,6 +56,8 @@ class OkiCamBot(commands.Bot):
     # args:
     #   message: message
     async def on_message(self, message):
+        if message.author == client.user:
+            return
         if isinstance(message.channel, discord.DMChannel):
             userMsg = message.content.lower()
             understand = False
@@ -86,9 +88,6 @@ class OkiCamBot(commands.Bot):
             if not understand:
                 await message.channel.send("dunno wat u said ima sniff mah butt...")
             return
-        if message.author == client.user:
-            return
-        
         message.content = message.content.lower()
         await self.process_commands(message)
 
