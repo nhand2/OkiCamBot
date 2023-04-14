@@ -57,9 +57,35 @@ class OkiCamBot(commands.Bot):
     #   message: message
     async def on_message(self, message):
         if isinstance(message.channel, discord.DMChannel):
-            await message.author.send("Hello")
+            userMsg = message.content.lower()
+            understand = False
+            if "hi" in userMsg:
+                understand = True
+                await message.channel.send("h-hello! bork bork!")
+            if "love" in userMsg:
+                understand = True
+                await message.channel.send("i-i love u too :')")
+            if "bye" in userMsg:
+                understand = True
+                await message.channel.send("b-bye!!! come back soon!!")
+            if "food" in userMsg:
+                understand = True
+                await message.channel.send("DID YOU SAY CHIMKEN!!?!?!?!?! BOROKBROKBORKBROBKROBKROBKROKBROBKROBKROBK")
+            if "sleep" in userMsg:
+                understand = True
+                await message.channel.send("i'd take a nap with you!! <3")
+            if "hand" in userMsg:
+                understand = True
+                await message.channel.send("**p-paw!**")
+            if "hug" in userMsg:
+                understand = True
+                await message.channel.send("i-i can't breattthhhhhhhhhhhhhhhheeeeeeee")
+            if "come" in userMsg:
+                understand = True
+                await message.channel.send("ON MYYYY WAY!!")
+            if not understand:
+                await message.channel.send("dunno wat u said ima sniff mah butt...")
             return
-            
         if message.author == client.user:
             return
         

@@ -263,7 +263,7 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     # args:
     @commands.command(name="tristan")
     async def oki_tristan(self, ctx):
-        """Send an image of oki"""
+        """tristan fantasy xiv"""
         file = File(f"./src/images/tristan.jpg", filename=f"tristan.jpg")
         discordEmbed = Embed()
         discordEmbed.set_image(url=f"attachment://tristan.jpg")
@@ -271,19 +271,8 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
 
     @commands.command(name="booba")
     async def oki_booba(self, ctx):
-        """Send an image of oki"""
+        """noooo0o0o0o"""
         await ctx.send("N-nooo!")
-    """
-        @commands.command(name="nam")
-        async def oki_nam(self, ctx):
-            number = randrange(19)  
-            nam = await ctx.bot.fetch_user(Settings.USER_UIDS.get(UID_ENUM.NAM))
-            file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
-
-            await nam.send(self.okiLoveMsgList[0].format(nam.mention))
-            await ctx.send("I-I send a message to nam!" + self.okiLoveMsgList[0].format(nam.mention), file=file)
-
-    """ 
 
     @commands.command(name="message", aliases=["audie", "betty", "derek", "fanfan", "fannie", "haku", "soap"])
     async def oki_message(self, ctx):
