@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import random
+import os
 from asyncio import sleep as s
 
 from decouple import config
@@ -13,6 +14,13 @@ from random import randrange
 from bot_helper import UID_ENUM
 from settings import Settings
 
+# Helper functions
+def fileCount(fileSubString):
+    count = 0
+    for file in os.listdir(f"./src/images/"):
+        if(file.__contains__(fileSubString)):
+            count += 1
+    return count
 
 class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     # The list of messages from oki.
@@ -252,7 +260,7 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     @commands.command(name="oki")
     async def oki_image(self, ctx):
         """Send an image of oki"""
-        number = randrange(19)
+        number = randrange(fileCount("oki"))
         file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
         discordEmbed = Embed()
         discordEmbed.set_image(url=f"attachment://oki{number}.PNG")
@@ -276,7 +284,8 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
 
     @commands.command(name="message", aliases=["audie", "betty", "derek", "fanfan", "fannie", "haku", "soap"])
     async def oki_message(self, ctx):
-        number = randrange(19)
+        """Send dm"""
+        number = randrange(fileCount("oki"))
         user_uid = None
         
         match ctx.invoked_with:
@@ -300,7 +309,7 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
         user = self.bot.get_user(user_uid) or await self.bot.fetch_user(user_uid)
 
         file = File(f"./src/images/oki{number}.PNG", filename=f"oki{number}.PNG")
-        await user.send(random.choice(self.okiLoveMsgList).format(user.mention))
+        await user.send(random.choice(self.okiLoveMsgList).format(user.mention), file=file)
         await ctx.send("I-I send a message! " + random.choice(self.okiLoveMsgList).format(user.mention), file=file)
 
     @commands.command(name="poll")
@@ -347,7 +356,7 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
     
     @commands.command(name="frog")
     async def oki_frog(self, ctx):
-        number = randrange(4)
+        number = randrange(fileCount("frog"))
         file = File(f"./src/images/frog{number}.PNG", filename=f"frog{number}.PNG")
         await ctx.send("froggy boi is my best fren!!\n **Art credit: AYU**", file=file)
     

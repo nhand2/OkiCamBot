@@ -61,30 +61,26 @@ class OkiCamBot(commands.Bot):
         if isinstance(message.channel, discord.DMChannel):
             userMsg = message.content.lower()
             understand = False
-            if "hi" in userMsg:
+
+            okiMessage = {
+                "hi": "h-hello! bork bork!",
+                "love": "i-i love u too :')",
+                "bye": "b-bye!!! come back soon!!",
+                "food": "DID YOU SAY CHIMKEN!!?!?!?!?! BOROKBROKBORKBROBKROBKROBKROKBROBKROBKROBK",
+                "sleep": "i'd take a nap with you!! <3",
+                "hand": "**p-paw!**",
+                "hug": "i-i can't breattthhhhhhhhhhhhhhhheeeeeeee",
+                "come": "ON MYYYY WAY!!",
+            }
+
+            okiReply = ""
+            for key in okiMessage:
+                if key in userMsg:
+                    okiReply += " "+ okiMessage[key]
+
+            if okiReply != "":
                 understand = True
-                await message.channel.send("h-hello! bork bork!")
-            if "love" in userMsg:
-                understand = True
-                await message.channel.send("i-i love u too :')")
-            if "bye" in userMsg:
-                understand = True
-                await message.channel.send("b-bye!!! come back soon!!")
-            if "food" in userMsg:
-                understand = True
-                await message.channel.send("DID YOU SAY CHIMKEN!!?!?!?!?! BOROKBROKBORKBROBKROBKROBKROKBROBKROBKROBK")
-            if "sleep" in userMsg:
-                understand = True
-                await message.channel.send("i'd take a nap with you!! <3")
-            if "hand" in userMsg:
-                understand = True
-                await message.channel.send("**p-paw!**")
-            if "hug" in userMsg:
-                understand = True
-                await message.channel.send("i-i can't breattthhhhhhhhhhhhhhhheeeeeeee")
-            if "come" in userMsg:
-                understand = True
-                await message.channel.send("ON MYYYY WAY!!")
+                await message.channel.send(okiReply)
             if not understand:
                 await message.channel.send("dunno wat u said ima sniff mah butt...")
             return
