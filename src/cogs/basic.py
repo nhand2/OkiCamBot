@@ -10,6 +10,8 @@ from discord import Embed
 from discord import File
 from pytz import timezone, utc
 from random import randrange
+from googlesearch import search
+from googletrans import Translator
 
 from bot_helper import UID_ENUM
 from settings import Settings
@@ -253,6 +255,16 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
         return message.author == self.bot.user or message.content.__contains__(
             Settings.OKI_BOT_COMMAND_PREFIX
         )
+    
+    # The oki what command.
+    # Translate language for you
+    # args:
+    @commands.command(name="wat")
+    async def oki_what(self, ctx, *, args):
+        """Oki can translate for you!"""
+        oki = '<:stupid:694254790607372318>'
+        translation = Translator().translate(args, dest="en")
+        await ctx.send(f"{oki}{oki}  I t-think that means:  {oki}{oki}\n\n{translation.text}")
 
     # The oki react command.
     # Reacts with an oki image
@@ -360,6 +372,11 @@ class BasicCommandsCog(commands.Cog, name="Basic Commands"):
         file = File(f"./src/images/frog{number}.PNG", filename=f"frog{number}.PNG")
         await ctx.send("froggy boi is my best fren!!\n **Art credit: AYU**", file=file)
     
+    @commands.command(name="search")
+    async def oki_search(self, ctx, *, arg):
+        for URL in search(arg, num_results=1):
+            await ctx.send(url=URL)
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         print (error)
